@@ -1,15 +1,15 @@
 
 // Start and end
-var start = 0;
-var end = 0;
+var start;
+var end;
 
 // How many columns and rows?
-var size = 25;
+var size = 40;
 
 
 // Width and height of each cell of world
-var width = 500;
-var height = 500;
+var width = 700;
+var height = 700;
 var w = width / size;
 var h = height / size;
 
@@ -32,16 +32,14 @@ var Node = function () {
     this.g = 0; // g(n) is the cost of the path from the start node to n
     this.h = 0; //h(n) is a heuristic that estimates the cost of the cheapest path from n to the goal   
     this.block = false // if the current node is act like a wall or block ? createBlock() make it randomly 
-    if (Math.random(1) < 0.2) {
+    this.previousNode = null;
+    if (Math.random(1) < 0.4) {
         this.block = true;
     }
      function Node(x, y) {
     
                 this.x = x;
                 this.y = y;
-                
-                this.previousNode = null;
-               
         }
 
         this.show = function(col) {
@@ -67,7 +65,20 @@ var Node = function () {
             if (this.y > 0) {
                 this.nearNodes.push(world[this.x][this.y - 1]);
             }
-           
+
+
+            if (this.x > 0 && this.y > 0) {
+                this.nearNodes.push(world[this.x - 1][this.y - 1]);
+            }
+            if (this.x > 0 && this.y < size - 1) {
+                this.nearNodes.push(world[this.x - 1][this.y + 1]);
+            }
+            if (this.x < size - 1 && this.y > 0) {
+                this.nearNodes.push(world[this.x + 1][this.y - 1]);
+            }
+            if (this.x < size - 1 && this.y < size - 1) {
+                this.nearNodes.push(world[this.x + 1][this.y + 1]);
+            }
         }
        
 }
@@ -117,6 +128,7 @@ function min_f (set) {
         if (minimal.f > set[i].f) {
             minimal = set[i];
         }
+        //console.log(minimal.f);
     }
     return minimal;
 }
@@ -130,14 +142,14 @@ function removeElement(array, node) {
 }
 
 function setup() {
-    createCanvas(400, 400);
+    createCanvas(700, 700);
     background(0);
 
     for (var i = 0; i < size; i++) {
 		for (var j = 0; j < size; j++) {
             world[i][j].show(color(255));
 		}
-	}
+    }
   }
   
   
@@ -146,10 +158,14 @@ function setup() {
 
     if (openSet.length > 0) {
 
-        var lowest = min_f(openSet);
-        
-
-        if (lowest == end) {
+        var winner = 0;
+        for (var i = 0; i < openSet.length; i++) {
+            if (openSet[i].f < openSet[winner].f) {
+                winner = i
+            }
+        }
+        var lowest = openSet[winner];
+        if (lowest === end) {
             //finding the path
             var temp = lowest;
             path.push(temp);
@@ -158,7 +174,7 @@ function setup() {
                 temp = temp.previousNode;
             }
             noLoop();
-            console.log("Winner!");
+            console.log(lowest);
         }
         
         removeElement(openSet, lowest);
