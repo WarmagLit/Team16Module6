@@ -1,0 +1,28 @@
+*{
+  padding: 0;
+  margin: 0;
+}
+
+.vertical-menu{
+  position: absolute;
+  width: 200px;
+  display: inline-block;
+}
+
+.vertical-menu a {
+  font-family: 'Source Sans Pro', sans-serif;
+  background-color: #eee; 
+  color: black; 
+  display: block; 
+  padding: 10px; 
+  text-decoration: none; 
+  margin-bottom: 10px;
+}
+
+.vertical-menu a:hover {
+  background-color:rgba(98, 211, 164, 0.61); 
+}
+
+.p5Canvas{
+  margin-left: 300px;
+}
