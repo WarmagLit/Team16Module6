@@ -2,9 +2,11 @@
 var start = 0;
 var end = 0;
 var isRunning = false;
+var switcher = true;
 
 // How many columns and rows?
 var size = 25;
+var prevSize = size;
 
 
 let inp = document.getElementById('num').value;
@@ -90,6 +92,7 @@ button.onclick = function() {
     openSet.length = 0;
     closedSet.length = 0;
     inp = document.getElementById('num').value;
+    prevSize = size;
     size = inp;
     w = width / size;
     h = height / size;
@@ -105,7 +108,7 @@ function createTheWorld() {
 	var i = void 0;
 	var j = void 0;
 
-    if (size != inp) {
+    if (prevSize != inp) {
         // Making a 2D array
         for (i = 0; i < size; i++) {
             world[i] = new Array(size);
@@ -124,10 +127,17 @@ function createTheWorld() {
                 world[i][j].addNearNodes(world);
             }
         }
-    }
+  
 	// Start and end
 	start = world[0][0];
-	end = world[size - 1][size - 1];
+    end = world[size - 1][size - 1];
+    }
+
+    for (i = 0; i < size; i++) {
+        for (j = 0; j < size; j++) {
+            world[i][j].previousNode = null;
+        }
+    }
 	//to make sure that the start and the end is not a block
 	start.block = false;
 	end.block = false;
@@ -159,7 +169,10 @@ function setup() {
     for (var i = 0; i < size; i++) {
 		for (var j = 0; j < size; j++) {
             world[i][j].show(color(255));
-		}
+            
+        }
+        start.show(color(255,255,0));
+        end.show(color(0,255,255));
 	}
   }
   
@@ -222,11 +235,23 @@ function setup() {
         for (var i = 0; i < size; i++) {
             for (var j = 0; j < size; j++) {
                 world[i][j].show(color(255));
+                if (world[i][j] == start) {
+                    world[i][j].show(color(255,255,0));
+                }
+                if (world[i][j] == end) {
+                    world[i][j].show(color(0,255,255));
+                }
             }
         }
         
         for (var i = 0; i < closedSet.length; i++) {
             closedSet[i].show(color(255,0,0));
+            if (closedSet[i] == start) {
+                closedSet[i].show(color(255,255,0));
+            }
+            if (closedSet[i] == end) {
+                closedSet[i].show(color(0,255,255));
+            }
         }
         
 
@@ -238,18 +263,18 @@ function setup() {
     }
     for (var i = 0; i < path.length; i++) {
         path[i].show(color(0,0,255));
+        start.show(color(255,255,0));
+        end.show(color(0,255,255));
+
     }
 
-    if (mouseIsPressed && ((Math.floor((mouseX - 300) / w) >= 0 && Math.floor((mouseX - 300) / w <= size)) 
-    && (Math.floor((mouseY) / h >= 0) && Math.floor((mouseY) / h <= size)))) {
-        console.log(mouseX);
-    }
+    
 
   }
 
 createTheWorld();
 
-function mousePressed(e) {
+function mouseClicked(e) {
     if ((Math.floor((mouseX) / w) >= 0 && Math.floor((mouseX) / w <= size)) 
     && (Math.floor((mouseY) / h >= 0) && Math.floor((mouseY) / h <= size))) {
         var rect = world[Math.floor((mouseX) / w)][Math.floor((mouseY) / h)];
@@ -266,6 +291,27 @@ function mousePressed(e) {
     }
 }
 
+function doubleClicked() {
+    if ((Math.floor((mouseX) / w) >= 0 && Math.floor((mouseX) / w <= size)) 
+    && (Math.floor((mouseY) / h >= 0) && Math.floor((mouseY) / h <= size))) {
+        var rect = world[Math.floor((mouseX) / w)][Math.floor((mouseY) / h)];
+
+        if (switcher) {
+        start = rect;
+        } else {
+            end = rect;
+        }
+        switcher = !switcher;
+
+        if (rect == start) {
+            rect.show(color(255,255,0));
+        }
+        if (rect == end) {
+            rect.show(color(0,255,255));
+        }
+        setup();
+    }
+}
 
 
 console.log(world[1][1].x);
