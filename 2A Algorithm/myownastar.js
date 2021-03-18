@@ -1,4 +1,3 @@
-
 // Start and end
 var start = 0;
 var end = 0;
@@ -8,8 +7,8 @@ var size = 25;
 
 
 // Width and height of each cell of world
-var width = 500;
-var height = 500;
+var width = 900;
+var height = 900;
 var w = width / size;
 var h = height / size;
 
@@ -31,15 +30,17 @@ var Node = function () {
     this.f = 0; //the main function of A* Algorithm
     this.g = 0; // g(n) is the cost of the path from the start node to n
     this.h = 0; //h(n) is a heuristic that estimates the cost of the cheapest path from n to the goal   
-    this.block = false // if the current node is act like a wall or block ? createBlock() make it randomly 
+    this.block = false;
+    // if the current node is act like a wall or block ? createBlock() make it randomly 
+
     if (Math.random(1) < 0.2) {
         this.block = true;
     }
+
      function Node(x, y) {
     
                 this.x = x;
                 this.y = y;
-                
                 this.previousNode = null;
                
         }
@@ -71,7 +72,7 @@ var Node = function () {
         }
        
 }
-    
+
 // guess of how far it is between two nodes
 function heuristic(node, otheNode) {
     var d =  abs(node.x - otheNode.x) + abs(node.y - otheNode.y);
@@ -107,7 +108,7 @@ function createTheWorld() {
 	//to make sure that the start and the end is not a block
 	start.block = false;
 	end.block = false;
-	openSet.push(start);
+//	openSet.push(start);
 
 }
 
@@ -130,9 +131,8 @@ function removeElement(array, node) {
 }
 
 function setup() {
-    createCanvas(400, 400);
+    createCanvas(900, 900);
     background(0);
-
     for (var i = 0; i < size; i++) {
 		for (var j = 0; j < size; j++) {
             world[i][j].show(color(255));
@@ -142,7 +142,6 @@ function setup() {
   
   
   function draw() {
-
 
     if (openSet.length > 0) {
 
@@ -202,21 +201,34 @@ function setup() {
     }
     
     for (var i = 0; i < closedSet.length; i++) {
-        closedSet[i].show(color(255,0,0));
+        closedSet[i].show(color(251, 56, 0));
     }
     
 
     for (var i = 0; i < openSet.length; i++) {
-        openSet[i].show(color(0,255,0));
+        openSet[i].show(color(191, 240, 0));
     }
  
     for (var i = 0; i < path.length; i++) {
-        path[i].show(color(0,0,255));
+        path[i].show(color(29, 129, 177));
     }
   }
 
-  
-
 createTheWorld();
- 
+
+function mousePressed(e) {
+
+    var rect = world[Math.floor((e.clientX - 300) / w)][Math.floor((e.clientY) / h)];
+
+    if(rect.block == false){
+        rect.block = true;
+    }
+    else{
+        rect.block = false;
+    }
+
+    setup();
+}
+
+
 console.log(world[1][1].x);
