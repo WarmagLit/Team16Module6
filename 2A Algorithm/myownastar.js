@@ -93,7 +93,6 @@ button.onclick = function() {
     size = inp;
     w = width / size;
     h = height / size;
-    world = new Array(size);
     createTheWorld();
     clear();
     setup();
@@ -106,25 +105,26 @@ function createTheWorld() {
 	var i = void 0;
 	var j = void 0;
 
-	// Making a 2D array
-	for (i = 0; i < size; i++) {
-		world[i] = new Array(size);
-	}
+    if (size != inp) {
+        // Making a 2D array
+        for (i = 0; i < size; i++) {
+            world[i] = new Array(size);
+        }
 
-	for (j = 0; j < size; j++) {
-		for (i = 0; i < size; i++) {
-            world[i][j] = new Node(i, j);
-            world[i][j].x = i;
-            world[i][j].y = j;
-		}
+        for (j = 0; j < size; j++) {
+            for (i = 0; i < size; i++) {
+                world[i][j] = new Node(i, j);
+                world[i][j].x = i;
+                world[i][j].y = j;
+            }
+        }
+        
+        for (i = 0; i < size; i++) {
+            for (j = 0; j < size; j++) {
+                world[i][j].addNearNodes(world);
+            }
+        }
     }
-    
-    for (i = 0; i < size; i++) {
-		for (j = 0; j < size; j++) {
-            world[i][j].addNearNodes(world);
-		}
-	}
-
 	// Start and end
 	start = world[0][0];
 	end = world[size - 1][size - 1];
@@ -239,23 +239,31 @@ function setup() {
     for (var i = 0; i < path.length; i++) {
         path[i].show(color(0,0,255));
     }
+
+    if (mouseIsPressed && ((Math.floor((mouseX - 300) / w) >= 0 && Math.floor((mouseX - 300) / w <= size)) 
+    && (Math.floor((mouseY) / h >= 0) && Math.floor((mouseY) / h <= size)))) {
+        console.log(mouseX);
+    }
+
   }
 
 createTheWorld();
 
 function mousePressed(e) {
+    if ((Math.floor((mouseX) / w) >= 0 && Math.floor((mouseX) / w <= size)) 
+    && (Math.floor((mouseY) / h >= 0) && Math.floor((mouseY) / h <= size))) {
+        var rect = world[Math.floor((mouseX) / w)][Math.floor((mouseY) / h)];
 
-    var rect = world[Math.floor((e.clientX - 300) / w)][Math.floor((e.clientY) / h)];
+        
+        if(rect.block == false){
+            rect.block = true;
+        }
+        else{
+            rect.block = false;
+        }
 
-    
-    if(rect.block == false){
-        rect.block = true;
+        setup();
     }
-    else{
-        rect.block = false;
-    }
-
-    setup();
 }
 
 
