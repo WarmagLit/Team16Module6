@@ -1,9 +1,14 @@
 // Start and end
 var start = 0;
 var end = 0;
+var isRunning = false;
 
 // How many columns and rows?
 var size = 25;
+
+
+let inp = document.getElementById('num').value;
+let button = document.querySelector('button');
 
 
 // Width and height of each cell of world
@@ -79,6 +84,24 @@ function heuristic(node, otheNode) {
     return d;
 }
 
+button.onclick = function() {
+    path.length = 0;
+    current = 0;
+    openSet.length = 0;
+    closedSet.length = 0;
+    inp = document.getElementById('num').value;
+    size = inp;
+    w = width / size;
+    h = height / size;
+    world = new Array(size);
+    createTheWorld();
+    clear();
+    setup();
+    isRunning = true;
+    console.log(inp);
+    
+}
+
 function createTheWorld() {
 	var i = void 0;
 	var j = void 0;
@@ -108,7 +131,7 @@ function createTheWorld() {
 	//to make sure that the start and the end is not a block
 	start.block = false;
 	end.block = false;
-//	openSet.push(start);
+	openSet.push(start);
 
 }
 
@@ -156,7 +179,8 @@ function setup() {
                 path.push(temp.previousNode);
                 temp = temp.previousNode;
             }
-            noLoop();
+            isRunning = false;
+            //noLoop();
             console.log("Winner!");
         }
         
@@ -192,25 +216,28 @@ function setup() {
         return 0;
     }
 
-    background(0);
- 
-    for (var i = 0; i < size; i++) {
-		for (var j = 0; j < size; j++) {
-			world[i][j].show(color(255));
-		}
-    }
+    if (isRunning) {
+        background(0);
     
-    for (var i = 0; i < closedSet.length; i++) {
-        closedSet[i].show(color(251, 56, 0));
-    }
-    
+        for (var i = 0; i < size; i++) {
+            for (var j = 0; j < size; j++) {
+                world[i][j].show(color(255));
+            }
+        }
+        
+        for (var i = 0; i < closedSet.length; i++) {
+            closedSet[i].show(color(255,0,0));
+        }
+        
 
-    for (var i = 0; i < openSet.length; i++) {
-        openSet[i].show(color(191, 240, 0));
-    }
+        for (var i = 0; i < openSet.length; i++) {
+            openSet[i].show(color(0,255,0));
+        }
  
+       
+    }
     for (var i = 0; i < path.length; i++) {
-        path[i].show(color(29, 129, 177));
+        path[i].show(color(0,0,255));
     }
   }
 
@@ -220,6 +247,7 @@ function mousePressed(e) {
 
     var rect = world[Math.floor((e.clientX - 300) / w)][Math.floor((e.clientY) / h)];
 
+    
     if(rect.block == false){
         rect.block = true;
     }
@@ -229,6 +257,7 @@ function mousePressed(e) {
 
     setup();
 }
+
 
 
 console.log(world[1][1].x);

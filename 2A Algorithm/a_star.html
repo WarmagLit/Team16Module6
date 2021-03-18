@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <title>A* algorithm</title>
-  <link rel="stylesheet" href="/style.css"/>
+  <link rel="stylesheet" href="../style.css"/>
   <script src="p5.js"></script>
 
   <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -23,7 +23,15 @@
         </div>
     </main>
 
-    <button onclick="openSet.push(start);">Start</button>
+    <select id = "num"> <!--раскрывающийся список-->
+      <option  value = 5 label = "5x5">
+      <option  value = 10 label = "10x10">
+      <option  value = 25 label = "25x25">
+      <option  value = 50 label = "50x50">
+      <option  value = 100 label = "100x100">
+    </select>
+
+    <button>Start</button>
    
   <script src="myownastar.js"></script>
 </body>
