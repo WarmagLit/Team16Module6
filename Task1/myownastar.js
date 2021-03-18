@@ -2,14 +2,37 @@
 // Start and end
 var start;
 var end;
+var isRunning = false;
+
+let inp = document.getElementById('num').value;
+let button = document.querySelector('button');
 
 // How many columns and rows?
-var size = 40;
+var size = 25;
 
+console.log(inp);
+
+button.onclick = function() {
+    path.length = 0;
+    current = 0;
+    openSet.length = 0;
+    closedSet.length = 0;
+    inp = document.getElementById('num').value;
+    size = inp;
+    w = width / size;
+    h = height / size;
+    world = new Array(size);
+    createTheWorld();
+    clear();
+    setup();
+    isRunning = true;
+    console.log(inp);
+    
+}
 
 // Width and height of each cell of world
-var width = 700;
-var height = 700;
+var width = 1000;
+var height = 1000;
 var w = width / size;
 var h = height / size;
 
@@ -33,7 +56,7 @@ var Node = function () {
     this.h = 0; //h(n) is a heuristic that estimates the cost of the cheapest path from n to the goal   
     this.block = false // if the current node is act like a wall or block ? createBlock() make it randomly 
     this.previousNode = null;
-    if (Math.random(1) < 0.4) {
+    if (Math.random(1) < 0.3) {
         this.block = true;
     }
      function Node(x, y) {
@@ -141,98 +164,103 @@ function removeElement(array, node) {
     }
 }
 
-function setup() {
-    createCanvas(700, 700);
-    background(0);
+    console.log('bye');
+    createTheWorld();
 
-    for (var i = 0; i < size; i++) {
-		for (var j = 0; j < size; j++) {
-            world[i][j].show(color(255));
-		}
+    function setup() {
+        createCanvas(1000, 1000);
+        background(0);
+
+        for (var i = 0; i < size; i++) {
+            for (var j = 0; j < size; j++) {
+                world[i][j].show(color(255));
+            }
+        }
     }
-  }
+    
   
-  
-  function draw() {
-
-
-    if (openSet.length > 0) {
-
-        var winner = 0;
-        for (var i = 0; i < openSet.length; i++) {
-            if (openSet[i].f < openSet[winner].f) {
-                winner = i
-            }
-        }
-        var lowest = openSet[winner];
-        if (lowest === end) {
-            //finding the path
-            var temp = lowest;
-            path.push(temp);
-            while (temp.previousNode) {
-                path.push(temp.previousNode);
-                temp = temp.previousNode;
-            }
-            noLoop();
-            console.log(lowest);
-        }
+    function draw() {
         
-        removeElement(openSet, lowest);
-        closedSet.push(lowest);
 
-        var neighbours = lowest.nearNodes;
+        if (openSet.length > 0) {
 
-        for (var i = 0; i < neighbours.length; i++) {
-            var neighbor = neighbours[i];
-            if (!closedSet.includes(neighbor) && !neighbor.block) {
-                var possG = lowest.g + 1;
-
-                if (openSet.includes(neighbor)) {
-                    if (possG < neighbor.g) {
-                        neighbor.g = possG;
-                    }
-                } else{
-                    neighbor.g = possG;
-                    openSet.push(neighbor);
+            var winner = 0;
+            for (var i = 0; i < openSet.length; i++) {
+                if (openSet[i].f < openSet[winner].f) {
+                    winner = i
                 }
+            }
+            var lowest = openSet[winner];
+            if (lowest === end) {
+                //finding the path
+                var temp = lowest;
+                path.push(temp);
+                while (temp.previousNode) {
+                    path.push(temp.previousNode);
+                    temp = temp.previousNode;
+                }
+                isRunning = false;
+                console.log(lowest);
+            }
+            
+            removeElement(openSet, lowest);
+            closedSet.push(lowest);
 
-                neighbor.previousNode = lowest;
-                neighbor.h = heuristic(neighbor, end);   
-                neighbor.f = neighbor.g + neighbor.h;
+            var neighbours = lowest.nearNodes;
+            
+                for (var i = 0; i < neighbours.length; i++) {
+                    
+                    var neighbor = neighbours[i];
+                    if (!closedSet.includes(neighbor) && !neighbor.block) {
+                        var possG = lowest.g + 1;
+
+                        if (openSet.includes(neighbor)) {
+                            if (possG < neighbor.g) {
+                                neighbor.g = possG;
+                            }
+                        } else{
+                            neighbor.g = possG;
+                            openSet.push(neighbor);
+                        }
+
+                        neighbor.previousNode = lowest;
+                        neighbor.h = heuristic(neighbor, end);   
+                        neighbor.f = neighbor.g + neighbor.h;
+                    
+
+                    }
+        
+                }
             
 
+        }
+        else {
+            return 0;
+        }
+        if (isRunning) {
+            background(0);
+        
+            for (var i = 0; i < size; i++) {
+                for (var j = 0; j < size; j++) {
+                    world[i][j].show(color(255));
+                }
             }
-   
+            
+            for (var i = 0; i < closedSet.length; i++) {
+                closedSet[i].show(color(255,0,0));
+            }
+            
+
+            for (var i = 0; i < openSet.length; i++) {
+                openSet[i].show(color(0,255,0));
+            }
+     
+           
+        }
+        for (var i = 0; i < path.length; i++) {
+            path[i].show(color(0,0,255));
         }
     }
-    else {
-        return 0;
-    }
 
-    background(0);
- 
-    for (var i = 0; i < size; i++) {
-		for (var j = 0; j < size; j++) {
-			world[i][j].show(color(255));
-		}
-    }
-    
-    for (var i = 0; i < closedSet.length; i++) {
-        closedSet[i].show(color(255,0,0));
-    }
     
 
-    for (var i = 0; i < openSet.length; i++) {
-        openSet[i].show(color(0,255,0));
-    }
- 
-    for (var i = 0; i < path.length; i++) {
-        path[i].show(color(0,0,255));
-    }
-  }
-
-  
-
-createTheWorld();
- 
-console.log(world[1][1].x);
