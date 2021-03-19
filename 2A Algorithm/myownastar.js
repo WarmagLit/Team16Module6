@@ -1,16 +1,20 @@
 // Start and end
 var start = 0;
 var end = 0;
-var isRunning = false;
-var switcher = true;
+
+var isRunning = false;  
+var switcher = true;    //switching between start/finish points 
 
 // How many columns and rows?
-var size = 25;
+var size = 30;
 var prevSize = size;
 
-
-let inp = document.getElementById('num').value;
-let button = document.querySelector('button');
+//control elements inputs
+let inp = document.getElementById('num').value; //grid size
+let range = document.getElementById('range').value;
+let btnStart = document.getElementById('start');
+let btnGen = document.getElementById('gen');
+let btnClear = document.getElementById('clr');
 
 
 // Width and height of each cell of world
@@ -26,7 +30,6 @@ var current = 0;
 // The road taken
 var path = [];
 
-
 // Open and closed set
 var openSet = [];
 var closedSet = []; // for storing the old nodes
@@ -40,7 +43,7 @@ var Node = function () {
     this.block = false;
     // if the current node is act like a wall or block ? createBlock() make it randomly 
 
-    if (Math.random(1) < 0.2) {
+    if (Math.random(1) < range) {
         this.block = true;
     }
 
@@ -80,13 +83,13 @@ var Node = function () {
        
 }
 
-// guess of how far it is between two nodes
+// guess of how far it is between two nodes (manhattan version)
 function heuristic(node, otheNode) {
     var d =  abs(node.x - otheNode.x) + abs(node.y - otheNode.y);
     return d;
 }
 
-button.onclick = function() {
+btnStart.onclick = function() {
     path.length = 0;
     current = 0;
     openSet.length = 0;
@@ -99,16 +102,48 @@ button.onclick = function() {
     createTheWorld();
     clear();
     setup();
-    isRunning = true;
-    console.log(inp);
-    
+    isRunning = true; 
+}
+
+btnClear.onclick = function() {
+    for (j = 0; j < size; j++) {
+        for (i = 0; i < size; i++) {
+            world[i][j].block = false;
+
+        }
+    }
+    clear();
+    setup();
+
+}
+
+btnGen.onclick = function() {
+    range = document.getElementById('range').value;
+    console.log(range);
+    for (j = 0; j < size; j++) {
+        for (i = 0; i < size; i++) {
+            world[i][j].block = false;
+
+        }
+    }
+    for (j = 0; j < size; j++) {
+        for (i = 0; i < size; i++) {
+            if (Math.random(1) < range) {
+                world[i][j].block = true;
+            }
+        }
+    }
+    start.block = false;
+    end.block = false;
+    clear();
+    setup();
 }
 
 function createTheWorld() {
 	var i = void 0;
 	var j = void 0;
 
-    if (prevSize != inp) {
+    if (prevSize != inp) {  
         // Making a 2D array
         for (i = 0; i < size; i++) {
             world[i] = new Array(size);
@@ -177,103 +212,103 @@ function setup() {
   }
   
   
-  function draw() {
+function draw() {
+if (openSet.length > 0) {
 
-    if (openSet.length > 0) {
-
-        var lowest = min_f(openSet);
-        
-
-        if (lowest == end) {
-            //finding the path
-            var temp = lowest;
-            path.push(temp);
-            while (temp.previousNode) {
-                path.push(temp.previousNode);
-                temp = temp.previousNode;
-            }
-            isRunning = false;
-            //noLoop();
-            console.log("Winner!");
+    var lowest = min_f(openSet);
+    
+    if (lowest == end) {
+        //finding the path
+        var temp = lowest;
+        path.push(temp);
+        while (temp.previousNode) {
+            path.push(temp.previousNode);
+            temp = temp.previousNode;
         }
-        
-        removeElement(openSet, lowest);
-        closedSet.push(lowest);
+        isRunning = false;
+        //noLoop();
+        console.log("Winner!");
+    }
+    
+    removeElement(openSet, lowest);
+    closedSet.push(lowest);
 
-        var neighbours = lowest.nearNodes;
+    var neighbours = lowest.nearNodes;
 
-        for (var i = 0; i < neighbours.length; i++) {
-            var neighbor = neighbours[i];
-            if (!closedSet.includes(neighbor) && !neighbor.block) {
-                var possG = lowest.g + 1;
+    for (var i = 0; i < neighbours.length; i++) {
+        var neighbor = neighbours[i];
+        if (!closedSet.includes(neighbor) && !neighbor.block) {
+            var possG = lowest.g + 1;
 
-                if (openSet.includes(neighbor)) {
-                    if (possG < neighbor.g) {
-                        neighbor.g = possG;
-                    }
-                } else{
+            if (openSet.includes(neighbor)) {
+                if (possG < neighbor.g) {
                     neighbor.g = possG;
-                    openSet.push(neighbor);
                 }
-
-                neighbor.previousNode = lowest;
-                neighbor.h = heuristic(neighbor, end);   
-                neighbor.f = neighbor.g + neighbor.h;
-            
-
+            } else{
+                neighbor.g = possG;
+                openSet.push(neighbor);
             }
-   
+
+            neighbor.previousNode = lowest;
+            neighbor.h = heuristic(neighbor, end);   
+            neighbor.f = neighbor.g + neighbor.h;
+        
+
+        }
+
+    }
+}
+else {
+    return;
+}
+
+if (isRunning) {
+    background(0);
+
+    for (var i = 0; i < size; i++) {
+        for (var j = 0; j < size; j++) {
+            world[i][j].show(color(255));
+            if (world[i][j] == start) {
+                world[i][j].show(color(255,255,0));
+            }
+            if (world[i][j] == end) {
+                world[i][j].show(color(0,255,255));
+            }
         }
     }
-    else {
-        return 0;
-    }
-
-    if (isRunning) {
-        background(0);
     
-        for (var i = 0; i < size; i++) {
-            for (var j = 0; j < size; j++) {
-                world[i][j].show(color(255));
-                if (world[i][j] == start) {
-                    world[i][j].show(color(255,255,0));
-                }
-                if (world[i][j] == end) {
-                    world[i][j].show(color(0,255,255));
-                }
-            }
+    for (var i = 0; i < closedSet.length; i++) {
+        closedSet[i].show(color(255,0,0));
+        if (closedSet[i] == start) {
+            closedSet[i].show(color(255,255,0));
         }
-        
-        for (var i = 0; i < closedSet.length; i++) {
-            closedSet[i].show(color(255,0,0));
-            if (closedSet[i] == start) {
-                closedSet[i].show(color(255,255,0));
-            }
-            if (closedSet[i] == end) {
-                closedSet[i].show(color(0,255,255));
-            }
+        if (closedSet[i] == end) {
+            closedSet[i].show(color(0,255,255));
         }
-        
-
-        for (var i = 0; i < openSet.length; i++) {
-            openSet[i].show(color(0,255,0));
-        }
- 
-       
     }
-    for (var i = 0; i < path.length; i++) {
-        path[i].show(color(0,0,255));
-        start.show(color(255,255,0));
-        end.show(color(0,255,255));
+    
 
+    for (var i = 0; i < openSet.length; i++) {
+        openSet[i].show(color(0,255,0));
     }
 
     
+}
+for (var i = 0; i < path.length; i++) {
+    path[i].show(color(0,0,255));
+    start.show(color(255,255,0));
+    end.show(color(0,255,255));
 
-  }
+}
 
+
+
+}
+
+//Creating first grid when opening the page
 createTheWorld();
 
+//Putting walls on click
 function mouseClicked(e) {
     if ((Math.floor((mouseX) / w) >= 0 && Math.floor((mouseX) / w <= size)) 
     && (Math.floor((mouseY) / h >= 0) && Math.floor((mouseY) / h <= size))) {
@@ -291,6 +326,7 @@ function mouseClicked(e) {
     }
 }
 
+//Putting start/finish point with double click
 function doubleClicked() {
     if ((Math.floor((mouseX) / w) >= 0 && Math.floor((mouseX) / w <= size)) 
     && (Math.floor((mouseY) / h >= 0) && Math.floor((mouseY) / h <= size))) {
@@ -313,5 +349,3 @@ function doubleClicked() {
     }
 }
 
-
-console.log(world[1][1].x);

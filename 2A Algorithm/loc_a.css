@@ -22,13 +22,18 @@ body{
 .p5Canvas{
     margin-left: 300px;
 }
-  
+
+#range{
+  width: 156px;
+}
+
 select{
     width: 156px;
     height: 40px;
   }
   
-  button{
-    width: 120px;
-    height: 40px;
-  }
+button{
+  margin-top: 5px;
+  width: 120px;
+  height: 40px;
+}
