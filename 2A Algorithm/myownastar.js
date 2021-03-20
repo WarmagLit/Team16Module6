@@ -4,6 +4,7 @@ var end = 0;
 
 var isRunning = false;  
 var switcher = true;    //switching between start/finish points 
+var pathChecker = true;
 
 // How many columns and rows?
 var size = 30;
@@ -93,7 +94,8 @@ function heuristic(node, otheNode) {
 inpBtn.onclick = function(){
 
     isRunning = false;
-
+    pathChecker = false;
+    
     path.length = 0;
     current = 0;
     openSet.length = 0;
@@ -121,13 +123,17 @@ btnStart.onclick = function() {
     createTheWorld();
     clear();
     setup();
+
     isRunning = true; 
+    pathChecker = true;
     openSet.push(start);
 }
 
 btnClear.onclick = function() {
 
     isRunning = false;
+    pathChecker = false;
+
     for (j = 0; j < size; j++) {
         for (i = 0; i < size; i++) {
             world[i][j].block = false;
@@ -142,6 +148,7 @@ btnClear.onclick = function() {
 btnGen.onclick = function() {
 
     isRunning = false;
+    pathChecker = false;
 
     range = document.getElementById('range').value;
     console.log(range);
@@ -317,11 +324,14 @@ if (isRunning) {
 
     
 }
-for (var i = 0; i < path.length; i++) {
-    path[i].show(color(0,0,255));
-    start.show(color(255,255,0));
-    end.show(color(0,255,255));
 
+if(pathChecker){
+    for (var i = 0; i < path.length; i++) {
+       path[i].show(color(0,0,255));
+       start.show(color(255,255,0));
+       end.show(color(0,255,255));
+
+    }
 }
 
 
