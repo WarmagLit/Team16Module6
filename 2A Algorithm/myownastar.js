@@ -16,6 +16,7 @@ let btnStart = document.getElementById('start');
 let btnGen = document.getElementById('gen');
 let btnClear = document.getElementById('clr');
 
+let inpBtn = document.getElementById('num');
 
 // Width and height of each cell of world
 var width = 900;
@@ -119,6 +120,24 @@ function heuristic(node, otherNode) {
     return d;
 }
 
+inpBtn.onclick = function(){
+
+    isRunning = false;
+
+    path.length = 0;
+    current = 0;
+    openSet.length = 0;
+    closedSet.length = 0;
+    inp = document.getElementById('num').value;
+    prevSize = size;
+    size = inp;
+    w = width / size;
+    h = height / size;
+    createTheWorld();
+    clear();
+    setup();
+}
+
 btnStart.onclick = function() {
     path.length = 0;
     current = 0;
@@ -133,9 +152,12 @@ btnStart.onclick = function() {
     clear();
     setup();
     isRunning = true; 
+    openSet.push(start);
 }
 
 btnClear.onclick = function() {
+
+    isRunning = false;
     for (j = 0; j < size; j++) {
         for (i = 0; i < size; i++) {
             world[i][j].block = false;
@@ -148,6 +170,9 @@ btnClear.onclick = function() {
 }
 
 btnGen.onclick = function() {
+
+    isRunning = false;
+
     range = document.getElementById('range').value;
     console.log(range);
     for (j = 0; j < size; j++) {
@@ -215,8 +240,6 @@ function createTheWorld() {
 	//to make sure that the start and the end is not a block
 	start.block = false;
 	end.block = false;
-	openSet.push(start);
-
 }
 
 function min_f (set) {
