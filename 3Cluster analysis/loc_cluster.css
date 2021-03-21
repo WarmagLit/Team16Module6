@@ -34,7 +34,13 @@ select{
     height: 40px;
   }
   
+  input{
+    width: 143px;
+    height: 30px;
+  }
+
   button{
+    margin:5px;
     width: 120px;
     height: 40px;
   }
