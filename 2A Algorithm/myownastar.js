@@ -64,28 +64,58 @@ var Node = function () {
         }
 
         this.addNearNodes = function(world) {
-
+            //right wall
             if (this.x < size - 1) {
                this.nearNodes.push(world[this.x + 1][this.y]);
             }
-         
+            //left wall
             if (this.x > 0) {
                 this.nearNodes.push(world[this.x - 1][this.y]);
             }
+            //bottom wall
             if (this.y < size - 1) {
                 this.nearNodes.push(world[this.x][this.y + 1]);
             }
+            //top wall
             if (this.y > 0) {
                 this.nearNodes.push(world[this.x][this.y - 1]);
             }
+
+            //bottom right
+            if (this.x < size - 1 && this.y < size - 1) {
+                if(!(world[this.x + 1][this.y].block && world[this.x][this.y + 1].block)) {
+                    this.nearNodes.push(world[this.x + 1][this.y + 1]);
+                }
+            }
+            
+            //bottom left
+            if (this.x > 0 && this.y < size - 1) {
+                if(!(world[this.x - 1][this.y].block && world[this.x][this.y + 1].block)) {
+                    this.nearNodes.push(world[this.x - 1][this.y + 1]);
+                }
+            }
+            //top right
+            if (this.x < size - 1 && this.y > 0) {
+                if(!(world[this.x + 1][this.y].block && world[this.x][this.y - 1].block)) {
+                    this.nearNodes.push(world[this.x + 1][this.y - 1]);
+                }
+            }
+            //top left
+            if (this.x > 0 && this.y > 0) {
+                if(!(world[this.x - 1][this.y].block && world[this.x][this.y - 1].block)) {
+                    this.nearNodes.push(world[this.x - 1][this.y - 1]);
+                }
+            }
+
            
         }
        
 }
 
 // guess of how far it is between two nodes (manhattan version)
-function heuristic(node, otheNode) {
-    var d =  abs(node.x - otheNode.x) + abs(node.y - otheNode.y);
+function heuristic(node, otherNode) {
+    var d = dist(node.x, node.y, otherNode.x, otherNode.y);
+    //var d =  abs(node.x - otherNode.x) + abs(node.y - otherNode.y);
     return d;
 }
 
@@ -143,7 +173,8 @@ function createTheWorld() {
 	var i = void 0;
 	var j = void 0;
 
-    if (prevSize != inp) {  
+    if (prevSize != inp) {
+        world.length = 0;  
         // Making a 2D array
         for (i = 0; i < size; i++) {
             world[i] = new Array(size);
@@ -173,6 +204,14 @@ function createTheWorld() {
             world[i][j].previousNode = null;
         }
     }
+
+    for (i = 0; i < size; i++) {
+        for (j = 0; j < size; j++) {
+            world[i][j].nearNodes.length = 0;
+            world[i][j].addNearNodes(world);
+        }
+    }
+
 	//to make sure that the start and the end is not a block
 	start.block = false;
 	end.block = false;
@@ -240,20 +279,23 @@ if (openSet.length > 0) {
         if (!closedSet.includes(neighbor) && !neighbor.block) {
             var possG = lowest.g + 1;
 
+            var newPath = false;
             if (openSet.includes(neighbor)) {
                 if (possG < neighbor.g) {
                     neighbor.g = possG;
+                    newPath = true;
                 }
             } else{
                 neighbor.g = possG;
+                newPath = true;
                 openSet.push(neighbor);
             }
 
-            neighbor.previousNode = lowest;
-            neighbor.h = heuristic(neighbor, end);   
-            neighbor.f = neighbor.g + neighbor.h;
-        
-
+            if (newPath) {
+                neighbor.previousNode = lowest;
+                neighbor.h = heuristic(neighbor, end);   
+                neighbor.f = neighbor.g + neighbor.h;
+            }
         }
 
     }
