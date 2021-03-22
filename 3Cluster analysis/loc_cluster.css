@@ -1,40 +1,39 @@
 body{
-    min-height: 100vh;
-    position: relative;
-  }
-  
-  main{
-    display: inline-block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-right: -50%;
-    transform: translate(-50%, -50%);
-  }
-  
-  .vertical-menu{
-    position: absolute;
-    width: 280px;
-    display: inline-block;
-  }
+  min-height: 100vh;
+  position: relative;
+}
 
-  #canvas {
-    margin: 0%;
-    width: 700px;
-    height: 600px;
-    
-  }
+main{
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}
+
+.vertical-menu{
+  position: absolute;
+  width: 280px;
+  display: inline-block;
+}
+
 
 .p5Canvas{
-    margin-left: 300px;
+  margin-left: 300px;
 }
-  
+
+#range{
+width: 156px;
+}
+
 select{
-    width: 156px;
-    height: 40px;
-  }
-  
-  button{
-    width: 120px;
-    height: 40px;
-  }
+  width: 156px;
+  height: 40px;
+}
+
+button{
+margin-top: 5px;
+width: 120px;
+height: 40px;
+}
