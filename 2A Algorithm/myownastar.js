@@ -419,12 +419,11 @@ function doubleClicked() {
 //                    Maze generation                     //
 //                                                        //
 ////////////////////////////////////////////////////////////
-
-let btnGenMaze = document.getElementById('genMaze');
-
+const WALL_RANDOM_CHANCE = 0.6;
 const TRACTOR_COUNT = 10;
 const tractors = [];
 
+let btnGenMaze = document.getElementById('genMaze');
 let tractorsAreSet = false;
 
 function delay(timeout) {
@@ -458,17 +457,17 @@ function moveMainTractor(tractor) {
     //console.log(`Tractor location: ${tractor.x}, ${tractor.y}`);
 
     directions = [];
-    //let tempSize = (size % 2 == 1) ? size : size - 1;
+    let tempSize = (size % 2 == 1) ? size : size - 1;
     if (tractor.x > 0) {
         directions.push([-2, 0]);
     }
-    if (tractor.x < size - 1) {
+    if (tractor.x < tempSize - 1) {
         directions.push([2, 0]);
     }
     if (tractor.y > 0) {
         directions.push([0, -2]);
     }
-    if (tractor.y < size - 1) {
+    if (tractor.y < tempSize - 1) {
         directions.push([0, 2]);
     }
     
@@ -488,10 +487,29 @@ function moveMainTractor(tractor) {
     //console.log(`Tractor has moved to ${tractor.x}, ${tractor.y}`);
 }
 
+function moveHorizontalTractor() {
+    for (let i = 0; i < size - 1; i += 2) {
+        if (Math.random() < WALL_RANDOM_CHANCE) {
+            world[i][size - 1].block = false;
+        }
+    }
+}
+
+function moveVerticalTractor() {
+    if (world[size - 2][size - 1].block == true) {
+        world[size - 1][size - 2].block = false;
+    }
+    for (let i = 0; i < size - 3; i += 2) {
+        if (Math.random() < WALL_RANDOM_CHANCE) {
+            world[size - 1][i].block = false;
+        }
+    }
+}
+
 function isValidMaze() {
-    //let tempSize = (size % 2 == 1) ? size : size - 1;
-    for (let i = 0; i < size; i+= 2) {
-        for (let j = 0; j < size; j+= 2) {
+    let tempSize = (size % 2 == 1) ? size : size - 1;
+    for (let i = 0; i < tempSize; i+= 2) {
+        for (let j = 0; j < tempSize; j+= 2) {
             if (world[i][j].block === true) {
                 return false;
             }            
@@ -511,8 +529,20 @@ function generateMaze() {
         for (let i = 0; i < TRACTOR_COUNT; i++) {
             moveMainTractor(tractors[i]);
         }
-        //moveMainTractor(tractors[0]);
     }
+
+    if (size % 2 == 0) {
+        //console.log("Horizontal tractor has started working");
+        moveHorizontalTractor();
+        //console.log("Horizontal tractor has finished working");
+    
+        //console.log("Vertical tractor has started working");
+        moveVerticalTractor();
+        //console.log("Vertical tractor has finished working");
+
+        world[size - 1][size - 1].block = false;
+    }
+
     console.log('Maze generation has finished');
 }
 btnGenMaze.onclick = function () {
