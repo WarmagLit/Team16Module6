@@ -414,3 +414,159 @@ function doubleClicked() {
     }
 }
 
+////////////////////////////////////////////////////////////
+//                                                        //
+//                    Maze generation                     //
+//                                                        //
+////////////////////////////////////////////////////////////
+const WALL_RANDOM_CHANCE = 0.6;
+const TRACTOR_COUNT = 10;
+const tractors = [];
+
+let btnGenMaze = document.getElementById('genMaze');
+let tractorsAreSet = false;
+
+function delay(timeout) {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+}
+
+function getRandomItem(array) {
+    const index = Math.floor(Math.random() * array.length);
+    return array[index];
+}
+
+function resetTractors() {
+    for (let i = 0; i < TRACTOR_COUNT; i++) {
+        tractors[i].x = 0;
+        tractors[i].y = 0;
+    }
+}
+
+function setTractors() {
+    for (let i = 0; i < TRACTOR_COUNT; i++) {
+        tractors.push({
+            x: 0,
+            y: 0
+        });
+    }
+    world[0][0].block = false;
+    tractorsAreSet = true;
+}
+
+function moveMainTractor(tractor) {
+    //console.log(`Tractor location: ${tractor.x}, ${tractor.y}`);
+
+    directions = [];
+    let tempSize = (size % 2 == 1) ? size : size - 1;
+    if (tractor.x > 0) {
+        directions.push([-2, 0]);
+    }
+    if (tractor.x < tempSize - 1) {
+        directions.push([2, 0]);
+    }
+    if (tractor.y > 0) {
+        directions.push([0, -2]);
+    }
+    if (tractor.y < tempSize - 1) {
+        directions.push([0, 2]);
+    }
+    
+    const [dx, dy] = getRandomItem(directions);
+    
+    
+    tractor.x += dx;
+    tractor.y += dy;
+
+    //console.log(directions);
+    //console.log(`Tractor is trying to move to ${tractor.x}, ${tractor.y}`);
+    
+    if (world[tractor.x][tractor.y].block) {
+        world[tractor.x][tractor.y].block = false;
+        world[tractor.x - dx / 2][tractor.y - dy / 2].block = false;
+    }
+    //console.log(`Tractor has moved to ${tractor.x}, ${tractor.y}`);
+}
+
+function moveHorizontalTractor() {
+    for (let i = 0; i < size - 1; i += 2) {
+        if (Math.random() < WALL_RANDOM_CHANCE) {
+            world[i][size - 1].block = false;
+        }
+    }
+}
+
+function moveVerticalTractor() {
+    if (world[size - 2][size - 1].block == true) {
+        world[size - 1][size - 2].block = false;
+    }
+    for (let i = 0; i < size - 3; i += 2) {
+        if (Math.random() < WALL_RANDOM_CHANCE) {
+            world[size - 1][i].block = false;
+        }
+    }
+}
+
+function isValidMaze() {
+    let tempSize = (size % 2 == 1) ? size : size - 1;
+    for (let i = 0; i < tempSize; i+= 2) {
+        for (let j = 0; j < tempSize; j+= 2) {
+            if (world[i][j].block === true) {
+                return false;
+            }            
+        }
+    }
+    return true;
+}
+
+function generateMaze() {
+    console.log('Setting tractors');
+    setTractors();
+    if (tractorsAreSet) {
+        resetTractors();
+    }
+    console.log('Maze generation has started');
+    while (!isValidMaze()) {
+        for (let i = 0; i < TRACTOR_COUNT; i++) {
+            moveMainTractor(tractors[i]);
+        }
+    }
+
+    if (size % 2 == 0) {
+        //console.log("Horizontal tractor has started working");
+        moveHorizontalTractor();
+        //console.log("Horizontal tractor has finished working");
+    
+        //console.log("Vertical tractor has started working");
+        moveVerticalTractor();
+        //console.log("Vertical tractor has finished working");
+
+        world[size - 1][size - 1].block = false;
+    }
+
+    console.log('Maze generation has finished');
+}
+btnGenMaze.onclick = function () {
+    path.length = 0;
+    current = 0;
+    openSet.length = 0;
+    closedSet.length = 0;
+    inp = document.getElementById('num').value;
+    prevSize = size;
+    size = inp;
+    w = width / size;
+    h = height / size;
+    isRunning = false;
+    for (j = 0; j < size; j++) {
+        for (i = 0; i < size; i++) {
+            world[i][j].block = true;
+        }
+    }
+
+    generateMaze();
+
+    start = world[0][0];
+    end = world[size - 1][size - 1];
+
+    clear();
+    setup();
+}
