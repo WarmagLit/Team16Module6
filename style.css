@@ -18,13 +18,18 @@ body{
   padding: 10px; 
   text-decoration: none; 
   margin-bottom: 10px;
+  border-radius: 30px;
 }
 
 .vertical-menu a:hover, button:hover {
-  background-color:rgba(98, 211, 164, 0.61); 
+  background-color:rgba(0, 0, 0, 0.61); 
+  color:#eee;
   cursor: pointer;
+  transition-duration: 0.4s;
+
 }
 
 button {
   border:none;
+  border-radius: 30px;
 }
