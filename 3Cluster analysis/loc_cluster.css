@@ -28,17 +28,6 @@ width: 156px;
 }
 
 select{
-<<<<<<< HEAD
-  width: 156px;
-  height: 40px;
-}
-
-button{
-margin-top: 5px;
-width: 120px;
-height: 40px;
-}
-=======
     width: 156px;
     height: 40px;
   }
@@ -53,4 +42,4 @@ height: 40px;
     width: 120px;
     height: 40px;
   }
->>>>>>> master
+
