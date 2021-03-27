@@ -28,6 +28,7 @@ width: 156px;
 }
 
 select{
+<<<<<<< HEAD
   width: 156px;
   height: 40px;
 }
@@ -37,3 +38,19 @@ margin-top: 5px;
 width: 120px;
 height: 40px;
 }
+=======
+    width: 156px;
+    height: 40px;
+  }
+  
+  input{
+    width: 143px;
+    height: 30px;
+  }
+
+  button{
+    margin:5px;
+    width: 120px;
+    height: 40px;
+  }
+>>>>>>> master
