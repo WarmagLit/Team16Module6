@@ -53,7 +53,7 @@ function calculate(a) {
 
             var r = a.distance(allPoints[i].x,allPoints[i].y);
             allPoints[i].tendency = 1 / r;
-            denominator += (Math.pow(allPoints[i].pheromone,1) * Math.pow(allPoints[i].tendency,3));
+            denominator += (Math.pow(allPoints[i].pheromone,1) * Math.pow(allPoints[i].tendency,5));
 
         }
     }
@@ -61,7 +61,7 @@ function calculate(a) {
     for(var i = 0; i < allPoints.length; i++){
         
         if(a.x != allPoints[i].x && a.y != allPoints[i].y){
-            numerator = Math.pow(allPoints[i].pheromone,1) * Math.pow(allPoints[i].tendency,3);
+            numerator = Math.pow(allPoints[i].pheromone,1) * Math.pow(allPoints[i].tendency,5);
 
             allPoints[i].chance = (numerator / denominator);
         }
@@ -78,18 +78,10 @@ function findNextNode(a) {
     var ind = -1;
 
     var nextRand = Math.random();
+
     var sum = 0;
 
-    for(var i = 0; i < allPoints.length; i++){
-        sum += allPoints[i].chance;
-    }
-
-    nextRand += sum;
-
-    sum = 0;
-
-    
-    for(var i = 0;sum < nextRand && i < allPoints.length; i++){
+    for(var i = 0;sum <= nextRand && i < allPoints.length; i++){
         
         if(a.visited[i] == 0 ){
 
@@ -99,6 +91,7 @@ function findNextNode(a) {
         }
 
         sum += allPoints[i].chance;
+        nextRand +=sum;
     }
     
     for(var i = 0; i < allPoints.length; i++){
@@ -131,7 +124,7 @@ btnStart.onclick = function(){
     var ind = -1;
 
  
-    for(var k = 0; k < 1000; k++){
+    for(var k = 0; k < 1; k++){
         for(var j = 0; j < ants.length; j++){
             ants[j].visited.length =  allPoints.length;
             ants[j].visited.fill(0);
@@ -163,6 +156,12 @@ btnStart.onclick = function(){
     console.log(bestPath);
     console.log(bestPathArr);
 
+    for(var i = 0; i  < allPoints.length; i++){
+        for(var j = i + 1; j < allPoints.length; j++){
+            var dis = (Math.sqrt(Math.pow(allPoints[i].x - allPoints[j].x,2)+Math.pow(allPoints[i].y - allPoints[j].y,2)))
+            console.log(i + " - " + j + " : " + dis);
+        }
+    }
     if (ind != -1){
         background(255);
         for(var i = 0; i < bestPathArr.length - 1; i++){
@@ -176,6 +175,11 @@ btnStart.onclick = function(){
 
         fill(255);
         ellipse(allPoints[ind].x, allPoints[ind].y, 30, 30);
+
+        for(var i = 0; i < allPoints.length; i++){
+            fill(255, 0, 0);
+            text(i, allPoints[i].x , allPoints[i].y);
+         }
     }
 }
 
