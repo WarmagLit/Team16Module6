@@ -45,22 +45,25 @@ var Ant = function () {
 function calculate(a) {
 
     var denominator = 0;
+    var numerator = 0;
+
     for(var i = 0; i < allPoints.length; i++){
 
         if(a.x != allPoints[i].x && a.y != allPoints[i].y){
 
             var r = a.distance(allPoints[i].x,allPoints[i].y);
-            allPoints[i].tendency = 1/ r;
-            denominator += (Math.pow(allPoints[i].pheromone,2) * Math.pow(allPoints[i].tendency,4));
+            allPoints[i].tendency = 1 / r;
+            denominator += (Math.pow(allPoints[i].pheromone,1) * Math.pow(allPoints[i].tendency,3));
 
-            allPoints[i].pheromone *= allPoints[i].pheromone;
         }
     }
 
     for(var i = 0; i < allPoints.length; i++){
         
         if(a.x != allPoints[i].x && a.y != allPoints[i].y){
-        allPoints[i].chance = allPoints[i].tendency / denominator;
+            numerator = Math.pow(allPoints[i].pheromone,1) * Math.pow(allPoints[i].tendency,3);
+
+            allPoints[i].chance = (numerator / denominator);
         }
         else{
             allPoints[i].chance = 0;
@@ -70,29 +73,45 @@ function calculate(a) {
 
 function findNextNode(a) {
 
-    var maxB = 0;
     var maxX;
     var maxY;
     var ind = -1;
 
-    for(var i = 0; i < allPoints.length; i++){
-        
-        if(maxB < allPoints[i].chance && a.visited[i] == 0 ){
+    var nextRand = Math.random();
+    var sum = 0;
 
-            maxB = allPoints[i].chance;
+    for(var i = 0; i < allPoints.length; i++){
+        sum += allPoints[i].chance;
+    }
+
+    nextRand += sum;
+
+    sum = 0;
+
+    
+    for(var i = 0;sum < nextRand && i < allPoints.length; i++){
+        
+        if(a.visited[i] == 0 ){
+
             maxX = allPoints[i].x;
             maxY = allPoints[i].y;
             ind = i;
         }
+
+        sum += allPoints[i].chance;
     }
     
+    for(var i = 0; i < allPoints.length; i++){
+        allPoints[i].pheromone *= 0.7;
+    }
+
     if(ind != -1){
         a.dist += a.distance(allPoints[ind].x,allPoints[ind].y);
         a.x = maxX;
         a.y = maxY;
         a.path.push(ind);
         a.visited[ind] = 1;
-        allPoints[ind].pheromone /= 0.4;
+        allPoints[ind].pheromone /= 0.5;
     }
 
 }
@@ -112,7 +131,7 @@ btnStart.onclick = function(){
     var ind = -1;
 
  
-    for(var k = 0; k < 100; k++){
+    for(var k = 0; k < 1000; k++){
         for(var j = 0; j < ants.length; j++){
             ants[j].visited.length =  allPoints.length;
             ants[j].visited.fill(0);
@@ -136,7 +155,7 @@ btnStart.onclick = function(){
         }
         
         for(var i = 0; i < allPoints.length; i++){
-            allPoints[i].pheromone = 0.2;
+            allPoints[i].pheromone = 0.3;
         }
     }
 
