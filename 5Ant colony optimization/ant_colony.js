@@ -49,19 +49,22 @@ function calculate(a) {
 
     for(var i = 0; i < allPoints.length; i++){
 
-        if(a.x != allPoints[i].x && a.y != allPoints[i].y){
+        if(a.visited[i] == 0){
 
-            var r = a.distance(allPoints[i].x,allPoints[i].y);
+            var r = a.distance(allPoints[i].x,allPoints[i].y );
             allPoints[i].tendency = 1 / r;
-            denominator += (Math.pow(allPoints[i].pheromone,1) * Math.pow(allPoints[i].tendency,5));
+            denominator += (Math.pow(allPoints[i].pheromone,1.5) * Math.pow(allPoints[i].tendency,2));
 
+        }
+        else{
+            allPoints[i].tendency = 0;
         }
     }
 
     for(var i = 0; i < allPoints.length; i++){
         
-        if(a.x != allPoints[i].x && a.y != allPoints[i].y){
-            numerator = Math.pow(allPoints[i].pheromone,1) * Math.pow(allPoints[i].tendency,5);
+        if(a.visited[i] == 0){
+            numerator = Math.pow(allPoints[i].pheromone,1.5) * Math.pow(allPoints[i].tendency,2);
 
             allPoints[i].chance = (numerator / denominator);
         }
@@ -79,19 +82,18 @@ function findNextNode(a) {
 
     var nextRand = Math.random();
 
-    var sum = 0;
+    for(var i = 0; i < allPoints.length; i++){
 
-    for(var i = 0;sum <= nextRand && i < allPoints.length; i++){
-        
-        if(a.visited[i] == 0 ){
+        if(a.visited[i] == 0 && nextRand < allPoints[i].chance){
 
             maxX = allPoints[i].x;
             maxY = allPoints[i].y;
             ind = i;
+            break;
         }
-
-        sum += allPoints[i].chance;
-        nextRand +=sum;
+        else if (nextRand >= allPoints[i].chance){
+            nextRand -= allPoints[i].chance;
+        }
     }
     
     for(var i = 0; i < allPoints.length; i++){
@@ -114,23 +116,27 @@ var bestPath = 999999999;
 
 btnStart.onclick = function(){
 
-    for(var i = 0; i < allPoints.length; i++){
-        var a = new Ant();
-
-        a.x = allPoints[i].x; 
-        a.y = allPoints[i].y;
-        ants.push(a);
-    }
     var ind = -1;
 
  
-    for(var k = 0; k < 1; k++){
+    for(var k = 0; k < 1000; k++){
+
+        for(var i = 0; i < allPoints.length; i++){
+            var a = new Ant();
+    
+            a.x = allPoints[i].x; 
+            a.y = allPoints[i].y;
+            ants.push(a);
+        }
+
         for(var j = 0; j < ants.length; j++){
+
             ants[j].visited.length =  allPoints.length;
             ants[j].visited.fill(0);
             ants[j].visited[j] = 1
             ants[j].path = [];
             ants[j].path.push(j);
+
             for(var i = 0; i < allPoints.length; i++){
                 calculate(ants[j]);
                 findNextNode(ants[j]);
@@ -149,6 +155,7 @@ btnStart.onclick = function(){
         
         for(var i = 0; i < allPoints.length; i++){
             allPoints[i].pheromone = 0.3;
+            ants.splice(0,ants.length);
         }
     }
 
