@@ -1,6 +1,8 @@
 let btnClear = document.getElementById('clr');
 let btnStart = document.getElementById('start');
 
+var ALPHA = 1;
+var BETA = 2;
 
 var allPoints = [];
 var ants = [];
@@ -55,7 +57,7 @@ function calculate(a) {
 
             var r = a.distance(allPoints[i].x,allPoints[i].y );
             allPoints[i].tendency = 1 / r;
-            denominator += (Math.pow(pheromone[a.currentPos][i],1) * Math.pow(allPoints[i].tendency,2));
+            denominator += (Math.pow(pheromone[a.currentPos][i],ALPHA) * Math.pow(allPoints[i].tendency,BETA));
 
         }
         else{
@@ -66,7 +68,7 @@ function calculate(a) {
     for(var i = 0; i < allPoints.length; i++){
         
         if(a.visited[i] == 0){
-            numerator = Math.pow(pheromone[a.currentPos][i],1) * Math.pow(allPoints[i].tendency,2);
+            numerator = Math.pow(pheromone[a.currentPos][i],ALPHA) * Math.pow(allPoints[i].tendency,BETA);
             allPoints[i].chance = (numerator / denominator);
         }
         else{
@@ -205,9 +207,13 @@ btnStart.onclick = function(){
 
     drawFinalPath();
     ants.splice(0, ants.length); 
+
+    document.getElementById('start').innerHTML = "Repeat";
 }
 
 btnClear.onclick = function(){
+
+    document.getElementById('start').innerHTML = "Start";
     allPoints = [];
     ants = [];
     bestPathArr = [];
@@ -220,7 +226,8 @@ btnClear.onclick = function(){
 
 function mouseClicked() {
 
-    if (mouseX > 0 && mouseX < 900 && mouseY > 0 && mouseY < 900) {
+    if (mouseX > 0 && mouseX < 900 && mouseY > 0 && mouseY < 900 && isStarted) {
+        
         var p = new Point();
 
         p.x = Math.floor(mouseX);
@@ -244,3 +251,27 @@ function draw(){
      }
     }
 }
+
+function sliderChangeAlp(val) {
+    document.getElementById('alpVal').innerHTML = val;
+}
+
+
+document.getElementById("alpSlide").addEventListener("input", function() {
+    ALPHA = this.value;
+    sliderChangeAlp(this.value);
+ });
+
+
+
+function sliderChangeBet(val) {
+    document.getElementById('betVal').innerHTML = val;
+}
+
+document.getElementById("betSlide").addEventListener("input", function() {
+    BETA = this.value;
+    sliderChangeBet(this.value);
+ });
+
+ sliderChangeAlp(ALPHA);
+ sliderChangeBet(BETA);

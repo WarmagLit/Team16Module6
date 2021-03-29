@@ -32,3 +32,33 @@ select{
     width: 120px;
     height: 40px;
   }
+
+  #AlpBlock{
+    margin-top: 50px;
+  }
+  #BetBlock{
+    margin-bottom: 10px;
+  }
+
+  #start{
+    float: right;
+    border: solid rgb(74, 122, 0);
+  }
+
+  #clr{
+    border: solid rgb(231, 78, 17);
+  }
+  .sliders *{
+    display: inline;
+  }
+
+  .sliders p{
+    font-size: 25px;
+  }
+
+  .sliders .rng{
+    margin-top: 6.5px;
+    width: 150px;
+    float: right;
+  }
+
