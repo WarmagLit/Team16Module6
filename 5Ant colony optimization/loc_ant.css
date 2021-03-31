@@ -28,14 +28,24 @@ select{
     height: 40px;
   }
   
+  .options{
+    margin-top: 50px;
+  }
+
   button{
     width: 120px;
     height: 40px;
   }
 
-  #AlpBlock{
-    margin-top: 50px;
+  #cycle{
+    font-size: 30px;
+    width: 280px;
+    height: 100px;
+    margin-bottom: 30px;
+
+    border: solid rgb(74, 122, 0);
   }
+
   #BetBlock{
     margin-bottom: 10px;
   }

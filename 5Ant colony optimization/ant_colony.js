@@ -1,5 +1,6 @@
 let btnClear = document.getElementById('clr');
 let btnStart = document.getElementById('start');
+let btnCycle = document.getElementById('cycle');
 
 var ALPHA = 1;
 var BETA = 2;
@@ -9,9 +10,10 @@ var ants = [];
 var bestPathArr = [];
 var pheromone = [];
 
+var isCycle = true;
 var isStarted = true;
+var bestPathCycle = 999999999;
 var bestPath = 999999999;
-
 
 var Point = function () {
     this.x;
@@ -146,6 +148,7 @@ function drawFinalPath(){
 
     isStarted = false;
     console.log(bestPath);
+    console.log(bestPathCycle);
     console.log(bestPathArr);
 
     background(255);
@@ -163,6 +166,17 @@ function drawFinalPath(){
     for(var i = 0; i < allPoints.length; i++){
         fill(255, 0, 0);
         text(i, allPoints[i].x , allPoints[i].y);
+    }
+}
+
+btnCycle.onclick = function(){
+    if(isCycle){
+        isCycle = false;
+        btnCycle.style.border =  'solid rgb(231, 78, 17)';
+    }
+    else{
+         isCycle = true;
+        btnCycle.style.border =  'solid rgb(74, 122, 0)';
     }
 }
 
@@ -194,11 +208,26 @@ btnStart.onclick = function(){
                 findNextNode(ants[j]);
             }
             
-            if (bestPath > ants[j].dist){
-                bestPath = ants[j].dist;
-                ind = j;
-                
-                bestPathArr = ants[j].path;
+
+            if(isCycle){
+                ants[j].path.push(j);
+                ants[j].dist +=  ants[j].distance(allPoints[j].x,allPoints[j].y);
+
+                if (bestPathCycle >= ants[j].dist){
+                    bestPathCycle = ants[j].dist;
+                    ind = j;
+                    
+                    bestPathArr = ants[j].path;
+                }
+            }
+            else{
+
+                if (bestPath >= ants[j].dist){
+                    bestPath = ants[j].dist;
+                    ind = j;
+                    
+                    bestPathArr = ants[j].path;
+                }
             }
         }
 
@@ -206,7 +235,7 @@ btnStart.onclick = function(){
     }
 
     drawFinalPath();
-    ants.splice(0, ants.length); 
+   ants.splice(0, ants.length); 
 
     document.getElementById('start').innerHTML = "Repeat";
 }
@@ -221,6 +250,7 @@ btnClear.onclick = function(){
 
     isStarted = true;
     bestPath = 999999999;
+    bestPathCycle = 999999999;
     setup();
 }
 
