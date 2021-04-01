@@ -2,18 +2,22 @@ let btnClear = document.getElementById('clr');
 let btnStart = document.getElementById('start');
 let btnCycle = document.getElementById('cycle');
 
-var ALPHA = 1;
-var BETA = 2;
+var ALPH = 1;
+var BET = 2;
 
 var allPoints = [];
 var ants = [];
+
 var bestPathArr = [];
+var bestPathArrCycle = [];
+
 var pheromone = [];
 
 var isCycle = true;
 var isStarted = true;
 var bestPathCycle = 999999999;
 var bestPath = 999999999;
+var indFin = 0;
 
 var Point = function () {
     this.x;
@@ -59,7 +63,7 @@ function calculate(a) {
 
             var r = a.distance(allPoints[i].x,allPoints[i].y );
             allPoints[i].tendency = 1 / r;
-            denominator += (Math.pow(pheromone[a.currentPos][i],ALPHA) * Math.pow(allPoints[i].tendency,BETA));
+            denominator += (Math.pow(pheromone[a.currentPos][i],ALPH) * Math.pow(allPoints[i].tendency,BET));
 
         }
         else{
@@ -70,7 +74,7 @@ function calculate(a) {
     for(var i = 0; i < allPoints.length; i++){
         
         if(a.visited[i] == 0){
-            numerator = Math.pow(pheromone[a.currentPos][i],ALPHA) * Math.pow(allPoints[i].tendency,BETA);
+            numerator = Math.pow(pheromone[a.currentPos][i],ALPH) * Math.pow(allPoints[i].tendency,BET);
             allPoints[i].chance = (numerator / denominator);
         }
         else{
@@ -144,17 +148,15 @@ function updatePheromone(){
     }
 }
 
-function drawFinalPath(){
+function drawFinalPath(PATHARR){
 
     isStarted = false;
-    console.log(bestPath);
-    console.log(bestPathCycle);
-    console.log(bestPathArr);
+
 
     background(255);
-    for(var i = 0; i < bestPathArr.length - 1; i++){
+    for(var i = 0; i < PATHARR.length - 1; i++){
         stroke(255,0,0);
-        line(allPoints[bestPathArr[i]].x, allPoints[bestPathArr[i]].y, allPoints[bestPathArr[i + 1]].x, allPoints[bestPathArr[i + 1]].y);
+        line(allPoints[PATHARR[i]].x, allPoints[PATHARR[i]].y, allPoints[PATHARR[i + 1]].x, allPoints[PATHARR[i + 1]].y);
     }
 
     for(var i = 0; i < allPoints.length; i++){
@@ -162,12 +164,59 @@ function drawFinalPath(){
     }
 
     fill(255);
-    ellipse(allPoints[ind].x, allPoints[ind].y, 30, 30);
+    ellipse(allPoints[indFin].x, allPoints[indFin].y, 30, 30);
     for(var i = 0; i < allPoints.length; i++){
         fill(255, 0, 0);
         text(i, allPoints[i].x , allPoints[i].y);
     }
 }
+
+function ANTALGO(){
+
+    for(var j = 0; j < ants.length; j++){
+
+        resetAnts(j);
+
+        for(var i = 0; i < allPoints.length; i++){
+            calculate(ants[j]);
+            findNextNode(ants[j]);
+        }
+        
+
+        if(isCycle){
+
+            ants[j].path.push(j);
+            ants[j].dist +=  ants[j].distance(allPoints[j].x,allPoints[j].y);
+
+            if (bestPathCycle >= ants[j].dist){
+                bestPathCycle = ants[j].dist;
+                indFin = j;
+                
+                bestPathArrCycle = ants[j].path;
+            }
+        }
+        else{
+
+            if (bestPath >= ants[j].dist){
+                bestPath = ants[j].dist;
+                indFin = j;
+                
+                bestPathArr = ants[j].path;
+            }
+        }
+    }
+
+    updatePheromone();
+
+    if(isCycle){
+        drawFinalPath(bestPathArrCycle);
+    }
+    else{
+        drawFinalPath(bestPathArr);
+    }
+}
+
+var AntInterval;
 
 btnCycle.onclick = function(){
     if(isCycle){
@@ -195,57 +244,22 @@ btnStart.onclick = function(){
             pheromone[i][j] = 0.2;
         }
     }
-
-    for(var k = 0; k < 1000; k++){
-
-
-        for(var j = 0; j < ants.length; j++){
-
-            resetAnts(j);
-
-            for(var i = 0; i < allPoints.length; i++){
-                calculate(ants[j]);
-                findNextNode(ants[j]);
-            }
-            
-
-            if(isCycle){
-                ants[j].path.push(j);
-                ants[j].dist +=  ants[j].distance(allPoints[j].x,allPoints[j].y);
-
-                if (bestPathCycle >= ants[j].dist){
-                    bestPathCycle = ants[j].dist;
-                    ind = j;
-                    
-                    bestPathArr = ants[j].path;
-                }
-            }
-            else{
-
-                if (bestPath >= ants[j].dist){
-                    bestPath = ants[j].dist;
-                    ind = j;
-                    
-                    bestPathArr = ants[j].path;
-                }
-            }
-        }
-
-        updatePheromone();
-    }
-
-    drawFinalPath();
-   ants.splice(0, ants.length); 
+    
+    AntInterval = setInterval(function(){
+        ANTALGO();
+    }, 100);
 
     document.getElementById('start').innerHTML = "Repeat";
 }
 
 btnClear.onclick = function(){
-
+    clearInterval(AntInterval);
+    ants.splice(0, ants.length); 
     document.getElementById('start').innerHTML = "Start";
     allPoints = [];
     ants = [];
     bestPathArr = [];
+    bestPathArrCycle = [];
     pheromone = [];
 
     isStarted = true;
@@ -288,8 +302,8 @@ function sliderChangeAlp(val) {
 
 
 document.getElementById("alpSlide").addEventListener("input", function() {
-    ALPHA = this.value;
-    sliderChangeAlp(this.value);
+    ALPH = this.value;
+    sliderChangeAlp(ALPH);
  });
 
 
@@ -299,9 +313,9 @@ function sliderChangeBet(val) {
 }
 
 document.getElementById("betSlide").addEventListener("input", function() {
-    BETA = this.value;
-    sliderChangeBet(this.value);
+    BET = this.value;
+    sliderChangeBet(BET);
  });
 
- sliderChangeAlp(ALPHA);
- sliderChangeBet(BETA);
+ sliderChangeAlp(ALPH);
+ sliderChangeBet(BET);
