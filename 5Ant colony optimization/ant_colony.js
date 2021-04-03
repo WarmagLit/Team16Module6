@@ -248,8 +248,6 @@ btnStart.onclick = function(){
     AntInterval = setInterval(function(){
         ANTALGO();
     }, 100);
-
-    document.getElementById('start').innerHTML = "Repeat";
 }
 
 btnClear.onclick = function(){
