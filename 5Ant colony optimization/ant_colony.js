@@ -188,7 +188,7 @@ function ANTALGO(){
             ants[j].path.push(j);
             ants[j].dist +=  ants[j].distance(allPoints[j].x,allPoints[j].y);
 
-            if (bestPathCycle >= ants[j].dist){
+            if (bestPathCycle > ants[j].dist){
                 bestPathCycle = ants[j].dist;
                 indFin = j;
                 
@@ -197,7 +197,7 @@ function ANTALGO(){
         }
         else{
 
-            if (bestPath >= ants[j].dist){
+            if (bestPath > ants[j].dist){
                 bestPath = ants[j].dist;
                 indFin = j;
                 
@@ -247,7 +247,7 @@ btnStart.onclick = function(){
     
     AntInterval = setInterval(function(){
         ANTALGO();
-    }, 100);
+    }, 10);
 }
 
 btnClear.onclick = function(){

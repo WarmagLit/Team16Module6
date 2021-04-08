@@ -7,47 +7,62 @@ var allPoints = [];
 var population = [];
 var shuffleArr = [];
 
-var bestPath;
+var PATH;
+var answ;
 
 
-
-var Point = function () {
-    this.x;
-    this.y;
-
-    this.dist;
-    this.index;
+class Point {
+    x;
+    y;
     
-    this.show = function() {
- 
+    indexPt;
+    
+    show = function() {
+        stroke(0);
         fill(0);
         ellipse(this.x, this.y, 30, 30);
+
+        fill(255);
+        text(this.indexPt, this.x - 2, this.y);
     }
 }
 
-var Chromosome = function(){
+class Chromosome {
 
-    this.gene = [];
-    this.dist = 0;
+    gene = [];
+    dist = 0;
 
 
-    this.addGene = function(pathArr){
+    addGenes = function(pathArr, arrLength){
 
-        for(var i = 0; i < pathArr.length - 1; i++){
+        for(var i = 0; i < arrLength - 1; i++){
 
-            this.dist += Math.sqrt(Math.pow(pathArr[i].x - pathArr[i + 1].x ,2)+ Math.pow(pathArr[i].y - pathArr[i + 1].y ,2))
+            this.dist += Math.sqrt(Math.pow(pathArr[i].x - pathArr[i + 1].x ,2)+ Math.pow(pathArr[i].y - pathArr[i + 1].y ,2));
             this.gene.push(pathArr[i]);
         }
 
         this.gene.push(pathArr[pathArr.length - 1]);
+
+        this.dist += Math.sqrt(Math.pow(pathArr[0].x - pathArr[arrLength - 1].x ,2)+ Math.pow(pathArr[0].y - pathArr[arrLength - 1].y ,2));
+    }
+
+    showPath = function(transparens){
+
+        stroke(255,0,0,transparens);
+        
+        for(let i = 0; i < this.gene.length - 1; i++){ 
+            line(this.gene[i].x,  this.gene[i].y,  this.gene[i + 1].x,  this.gene[i + 1].y);
+        }
+
+        line(this.gene[0].x,  this.gene[0].y,  this.gene[this.gene.length - 1].x,  this.gene[this.gene.length - 1].y);
     }
 }
 
 function shffl(array){
 
-    var i = array.length;
-    var j = 0;
-    var temp;
+    let i = array.length;
+    let j = 0;
+    let temp;
 
 
     while (i--) {
@@ -62,113 +77,163 @@ function shffl(array){
     return array;
 }
 
+function randInt(max){
+
+    let rand = Math.random() * (max);
+    return Math.floor(rand);
+}
+
 function firstPopulation(){
 
-    for(var i = 0; i < 10; i++){  //firstPopulation;
+    for(let i = 1; i < 10000; i++){  
 
-        var newChromo = new Chromosome();
-        shuffleArr = shffl(shuffleArr);
+        let newChromo = new Chromosome();
 
-        newChromo.addGene(shuffleArr);
+        newChromo.addGenes(shffl(shuffleArr),shuffleArr.length);
         population.push(newChromo);
-
-        if(bestPath.dist > newChromo.dist){
-            bestPath = newChromo;
-        }
     }
 }
 
 
-function drawFinalPath(){
+function nextGeneration(firstSpecimen, secondSpecimen, specLen){
+
+    
+    let indexPoint = [];
+    indexPoint.length = allPoints.length;
+    
+    for(let i = 0; i < 10000/specLen; i++){
+
+        let newChromo = new Chromosome();
+        let crossPoint =randInt(allPoints.length);
+
+        indexPoint.fill(0);
+
+        for(let j = 0; j < crossPoint; j++){
+
+            newChromo.gene.push(firstSpecimen.gene[j]);
+            indexPoint[firstSpecimen.gene[j].indexPt] = 1;
+        }
+
+        for(let j = crossPoint; j < allPoints.length; j++){
+
+            if(indexPoint[secondSpecimen.gene[j].indexPt] == 0){
+
+                newChromo.gene.push(secondSpecimen.gene[j]);
+                indexPoint[secondSpecimen.gene[j].indexPt] = 1;
+            }
+        }
+
+        if(newChromo.gene.length < allPoints.length){
+
+            for(let j = crossPoint; j < allPoints.length; j++){
+
+                if(indexPoint[firstSpecimen.gene[j].indexPt] == 0){
+    
+                    newChromo.gene.push(firstSpecimen.gene[j]);
+                    indexPoint[firstSpecimen.gene[j].indexPt] = 1;
+                }
+            }
+        }
+
+      
+        for(let i = 0; i < randInt(allPoints.length);i++){
+            let firstSwap = randInt(allPoints.length);
+            let secSwap = randInt(allPoints.length);
+            let temp;
+            while(firstSwap == secSwap){
+                secSwap = randInt(allPoints.length);
+            }
+            temp =  newChromo.gene[firstSwap];
+            newChromo.gene[firstSwap] = newChromo.gene[secSwap];
+            newChromo.gene[secSwap] = temp;
+        }
+        
+
+        for(let j = 0; j < allPoints.length - 1; j++){
+            newChromo.dist += Math.sqrt(Math.pow(newChromo.gene[j].x - newChromo.gene[j + 1].x ,2)+ Math.pow(newChromo.gene[j].y - newChromo.gene[j + 1].y ,2));
+        }
+        
+        newChromo.dist += Math.sqrt(Math.pow(newChromo.gene[0].x - newChromo.gene[newChromo.gene.length - 1].x ,2)+ Math.pow(newChromo.gene[0].y - newChromo.gene[newChromo.gene.length - 1].y ,2));
+
+        population.push(newChromo);
+    }
+}
+
+function selection(){
+
+
+    let specimens = [];
+    
+    population.sort(function(a,b){
+        return a.dist - b.dist;
+    });
+    
+    for(let i = 10; i < 10000; i+= 500){
+        specimens.push(population[i]);
+    }
+
+    population.splice(0,population.length);
+
+    for(let i = 0; i < specimens.length; i++){
+        nextGeneration(PATH, specimens[i], specimens.length);
+    }
+
+    population.sort(function(a,b){
+        return a.dist - b.dist;
+    });
+
+    if(answ.dist > population[0].dist){
+        answ = population[0];
+    }   
+
+    let rnd = Math.random();
+
+    if(rnd > 0.8){
+        PATH = population[100 + randInt(100)];
+    }
+    else{
+        PATH = population[0];
+    }
+
+
+    specimens.splice(0, specimens.length);
+    
+}
+
+function drawPATH(){
 
     isStarted = false;
 
-
     background(255);
-    for(var i = 0; i < bestPath.gene.length - 1; i++){
-        stroke(255,0,0);
-        line(bestPath.gene[i].x, bestPath.gene[i].y, bestPath.gene[i + 1].x, bestPath.gene[i + 1].y);
-    }
+
+    PATH.showPath(50);
+    answ.showPath(1000);
 
     for(var i = 0; i < allPoints.length; i++){
         allPoints[i].show();
     }
 }
 
-function selection(){
-
-    var firstSpecimen  = new Chromosome();
-    var secondSpecimen  = new Chromosome();
-
-    firstSpecimen  = bestPath;
-    secondSpecimen  = population[Math.floor(Math.random() * (10))];
-
-    var crossPoint = Math.floor(Math.floor(Math.random() * (allPoints.length)));
-    population.splice(0, population.length);
-
-    for(var i = 0; i < 10; i++){
-
-        var newChromo = new Chromosome();
-        var newChromoIndex = [];
-
-        newChromoIndex.length = allPoints.length;
-        newChromoIndex.fill(0);
-
-        for(var j = 0; j < crossPoint; j++){
-
-            newChromo.gene.push(firstSpecimen.gene[j]);
-            newChromoIndex[firstSpecimen.gene[j].index] = 1;
-        
-        }
-
-        for(var j = crossPoint; j < allPoints.length; j++){
-
-            if(newChromoIndex[secondSpecimen.gene[j].index] == 0){
-                newChromo.gene.push(secondSpecimen.gene[j]);
-                newChromoIndex[secondSpecimen.gene[j].index] = 1;
-            }
-        }
-
-        if ( newChromo.gene.length < allPoints.length){
-            
-            for(var j = crossPoint; j < allPoints.length; j++){
-
-                if(newChromoIndex[firstSpecimen.gene[j].index] == 0) {
-                    newChromo.gene.push(firstSpecimen.gene[j]);
-                    newChromoIndex[firstSpecimen.gene[j].index] = 1;
-                }
-            }
-        }
-
-        for(var j = 0; j < allPoints.length - 1; j++){
-
-            newChromo.dist += Math.sqrt(Math.pow(newChromo.gene[j].x - newChromo.gene[j + 1].x ,2) + Math.pow(newChromo.gene[j].y -  newChromo.gene[j + 1].y ,2));
-        }
-
-        population.push(newChromo);
-
-        if(bestPath.dist > newChromo.dist){
-            bestPath = newChromo;
-        }
-    }
-}
-
-var check = true;
 var GenInterval;
 
 btnStart.onclick = function(){
 
-    if(check){
-        bestPath = new Chromosome();
-        bestPath.dist = 9999999999;
-        firstPopulation();
-        check = false;
+    firstPopulation();
+    PATH = new Chromosome();
+    answ = new Chromosome();
+    answ = PATH = population[0];
+
+    for(let i = 0; i < population.length; i++){
+
+        if(PATH.dist > population[i].dist){
+            answ = PATH = population[i];   
+        }
     }
 
     GenInterval = setInterval(function(){
         selection();
-        drawFinalPath();
-    }, 100);
+        drawPATH();
+    },0)
 }
 
 btnClear.onclick = function(){
@@ -176,20 +241,20 @@ btnClear.onclick = function(){
     setup();
 }
 
-var indForPoint = 0;
-
 function mouseClicked() {
 
     if (mouseX > 0 && mouseX < 900 && mouseY > 0 && mouseY < 900 && isStarted) {
         
-        var p = new Point();
+        let newPoint = new Point();
 
-        p.x = Math.floor(mouseX);
-        p.y = Math.floor(mouseY);
-        p.index = indForPoint++;
+        newPoint.x = mouseX;
+        newPoint.y = mouseY;
 
-        allPoints.push(p);
-        shuffleArr.push(p);
+        newPoint.indexPt = allPoints.length;
+        allPoints.push(newPoint);
+
+        
+        shuffleArr.push(newPoint);
     }
 }
 
@@ -208,5 +273,4 @@ function draw(){
            allPoints[i].show();
         }
     }   
-    
 }
