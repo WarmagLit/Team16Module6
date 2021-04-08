@@ -7,26 +7,39 @@
 
   <link rel="stylesheet" href="../style.css"/>
   <link rel="stylesheet" href="loc_neural.css"/>
-  <script src="p5.js"></script>
+
 
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
 </head>
 
 <body>
-  <main>
-  <div class="vertical-menu">
-    <p><a href="../1MainPage/main.html">Main page</a></p>
-    <p><a href="../2A Algorithm/a_star.html">A* algorithm</a></p>
-    <p><a href="../3Cluster analysis/cluster.html">Cluster analysis</a></p>
-    <p><a href="../4Genetic algorithm/gen.html">Genetic algorithm</a></p>
-    <p><a href="../5Ant colony optimization/ant.html">Ant colony optimization</a></p>
-    <p><a href="../6Decision tree/tree.html">Decision tree</a></p>
+  <main id="mainblock">
+    
+    <div class="vertical-menu">
+      <p><a href="../1MainPage/main.html">Main page</a></p>
+      <p><a href="../2A Algorithm/a_star.html">A* algorithm</a></p>
+      <p><a href="../3Cluster analysis/cluster.html">Cluster analysis</a></p>
+      <p><a href="../4Genetic algorithm/gen.html">Genetic algorithm</a></p>
+      <p><a href="../5Ant colony optimization/ant.html">Ant colony optimization</a></p>
+      <p><a href="../6Decision tree/tree.html">Decision tree</a></p>
+      <div style="padding: 10px;"></div>
 
-    <button id = "clr">Clear</button>
-    <button id = "dtk">Detect</button>
+      
+      <button onclick="erase()">Clear</button>
+      <button onclick="recognize()">Recognize</button>
+      <input type="number" id="num" value="0">
+
+      <button onclick="saveDt()">Save</button>
+      <button onclick="viewDt()">View</button>
+
+      <div id="nnInput"></div>
+      <div style="float:left;font-size:200px;margin-left:80px;" id="nnOut"></div>
     </div>
-    </main>
-
+    <canvas id="canvas" width="560" height="560" style="border:2px solid;"></canvas>
+    <div id="recTime"></div>
+  </main>
+    
+    
     <script src="neuronnet.js"></script>
 </body>
