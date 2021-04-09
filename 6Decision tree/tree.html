@@ -4,8 +4,6 @@
 <head>
   <meta charset="utf-8" />
   <title>Decision tree</title>
-
-  <script src="papaparse.js"></script>
   <link rel="stylesheet" href="../style.css"/>
   <link rel="stylesheet" href="loc_tree.css"/>
   
@@ -14,7 +12,6 @@
 </head>
 
 <body>
-<!--
   <div class="vertical-menu">
     <p><a href="../1MainPage/main.html">Main page</a></p>
     <p><a href="../2A Algorithm/a_star.html">A* algorithm</a></p>
@@ -22,14 +19,16 @@
     <p><a href="../4Genetic algorithm/gen.html">Genetic algorithm</a></p>
     <p><a href="../5Ant colony optimization/ant.html">Ant colony optimization</a></p>
     <p><a href="../7NNs/neural.html">Neural network</a></p>
-  </div>
--->
-  <div>
     <input type="file" id="csvFile">
-    <button id="fileSubmitButton">Submit</button>
+    <div>
+      <label for="attrHeaderCheck">Attribute names in file? </label>
+      <input type="checkbox" id="attrHeaderCheck" accept=".csv">
+    </div>
   </div>
+  <div id="fix">a</div>
   <div class="tree">
     
   </div>
+  <script type="text/javascript" src="papaparse.js"></script>
   <script src="decisionTree.js"></script>
 </body>

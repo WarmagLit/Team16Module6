@@ -33,6 +33,10 @@ button{
   height: 40px;
 }
 
-.tree {
-  margin-top: 200px;
+#treeDiv {
+  margin-top: 300px;
+}
+
+#fix {
+  opacity: 0;
 }
