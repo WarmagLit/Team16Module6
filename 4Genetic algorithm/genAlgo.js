@@ -85,7 +85,7 @@ function randInt(max){
 
 function firstPopulation(){
 
-    for(let i = 1; i < 10000; i++){  
+    for(let i = 0; i < 10000; i++){  
 
         let newChromo = new Chromosome();
 
@@ -94,17 +94,16 @@ function firstPopulation(){
     }
 }
 
-
-function nextGeneration(firstSpecimen, secondSpecimen, specLen){
+function nextGeneration(firstSpecimen, secondSpecimen){
 
     
     let indexPoint = [];
     indexPoint.length = allPoints.length;
-    
-    for(let i = 0; i < 10000/specLen; i++){
+   
+    for(let i = 0; i < 10000; i++){
 
         let newChromo = new Chromosome();
-        let crossPoint =randInt(allPoints.length);
+        let crossPoint =  randInt(allPoints.length / 2);
 
         indexPoint.fill(0);
 
@@ -134,9 +133,8 @@ function nextGeneration(firstSpecimen, secondSpecimen, specLen){
                 }
             }
         }
-
-      
-        for(let i = 0; i < randInt(allPoints.length);i++){
+        
+        for(let i = 0; i < Math.random(5);i++){
             let firstSwap = randInt(allPoints.length);
             let secSwap = randInt(allPoints.length);
             let temp;
@@ -147,6 +145,8 @@ function nextGeneration(firstSpecimen, secondSpecimen, specLen){
             newChromo.gene[firstSwap] = newChromo.gene[secSwap];
             newChromo.gene[secSwap] = temp;
         }
+            
+         
         
 
         for(let j = 0; j < allPoints.length - 1; j++){
@@ -162,22 +162,36 @@ function nextGeneration(firstSpecimen, secondSpecimen, specLen){
 function selection(){
 
 
-    let specimens = [];
+    let SecSpecimen = new Chromosome();
     
     population.sort(function(a,b){
         return a.dist - b.dist;
     });
-    
-    for(let i = 10; i < 10000; i+= 500){
-        specimens.push(population[i]);
-    }
 
+    let nextSpecRnd = Math.random();
+
+    if(nextSpecRnd > 0.5){
+        SecSpecimen = population[500];   
+    }
+    else{
+        let i = 25;
+        while(population[i].dist == population[0].dist){
+            i += 25;
+
+            if(i > 9999){
+                i = 9999;
+                break;
+            }
+        }
+        
+        SecSpecimen = population[i];
+    }
+    
     population.splice(0,population.length);
 
-    for(let i = 0; i < specimens.length; i++){
-        nextGeneration(PATH, specimens[i], specimens.length);
-    }
-
+   
+    nextGeneration(PATH, SecSpecimen);
+    
     population.sort(function(a,b){
         return a.dist - b.dist;
     });
@@ -185,19 +199,8 @@ function selection(){
     if(answ.dist > population[0].dist){
         answ = population[0];
     }   
-
-    let rnd = Math.random();
-
-    if(rnd > 0.8){
-        PATH = population[100 + randInt(100)];
-    }
-    else{
-        PATH = population[0];
-    }
-
-
-    specimens.splice(0, specimens.length);
-    
+   
+    PATH = population[0];
 }
 
 function drawPATH(){
@@ -215,6 +218,7 @@ function drawPATH(){
 }
 
 var GenInterval;
+var currPop = 0;
 
 btnStart.onclick = function(){
 
@@ -233,6 +237,7 @@ btnStart.onclick = function(){
     GenInterval = setInterval(function(){
         selection();
         drawPATH();
+        document.getElementById('pop').innerHTML = currPop++;
     },0)
 }
 
