@@ -1,16 +1,19 @@
 //parser config
 const papaConfig = {
     complete: function(results) {
-        alert("Parsing complete!");
+        console.log("Parsing complete!");
     }
 }
 
 const fileSubmit = document.getElementById("csvFile");
+const buildTreeBtn = document.getElementById("buildTreeBtn");
+const treeDiv = document.getElementById("treeDiv");
 const selectionTypes = [];
 
 let attrNames = [];
-let dataTable;
-let rootNode;
+let dataTable = null;
+let defaultAttrNames = true;
+let tree;
 
 function defineSelectionTypes() {
     selectionTypes.length = dataTable[0].length - 1;
@@ -26,6 +29,25 @@ function defineSelectionTypes() {
     }
 }
 
+document.getElementById("attrHeaderCheck").addEventListener("change", function() {
+    if (attrNames.length != 0) {
+        if (document.getElementById("attrHeaderCheck").checked && defaultAttrNames) {
+            attrNames = dataTable[0];
+            dataTable.splice(0, 1);
+            defaultAttrNames = false;
+        }
+        else if (!document.getElementById("attrHeaderCheck").checked && !defaultAttrNames) {
+            let newAttrNames = [...attrNames];
+            dataTable.unshift(newAttrNames);
+
+            for (let i = 0; i < dataTable[0].length; i++) {
+                attrNames[i] = "parameter №" + (i + 1);
+            }
+            defaultAttrNames = true;
+        }
+    }
+});
+
 //добавить проверки на формат файла
 function fileSubmittion(evt) {
     let csvFilePath = evt.target.files[0];
@@ -35,18 +57,21 @@ function fileSubmittion(evt) {
     reader.onload = function(event) {
         let csvFile = event.target.result;
 
-        dataTable = Papa.parse(csvFile, papaConfig).data;
+        let parseResults = Papa.parse(csvFile, papaConfig);
+        dataTable = parseResults.data;
         console.log("file submitted successfully");
         console.log(dataTable);
 
         if (document.getElementById("attrHeaderCheck").checked) {
             attrNames = dataTable[0];
             dataTable.splice(0, 1);
+            defaultAttrNames = false;
         }
         else {
             for (let i = 0; i < dataTable[0].length; i++) {
-                attrNames[i] = "Parameter №" + (i + 1);
+                attrNames[i] = "parameter №" + (i + 1);
             }
+            defaultAttrNames = true;
         }
 
         defineSelectionTypes();
@@ -55,7 +80,15 @@ function fileSubmittion(evt) {
 
 fileSubmit.addEventListener("change", fileSubmittion);
 
-
+buildTreeBtn.addEventListener("click", function() {
+    if (dataTable == null) {
+        alert("Please choose a csv file first!");
+        return;
+    }
+    
+    tree = buildTree(dataTable);
+    visualiseTree(tree);
+});
 
 class Question {
     constructor(attrIndex, value) {
@@ -87,10 +120,23 @@ class leafNode {
     constructor(dataset) {
         this.predictions = answCount(dataset, attrNames.length - 1);
     }
-    print() {
+    printToConsole() {
         for (let key in this.predictions) {
             console.log(`${key}: ${this.predictions[key]}`);
         }
+    }
+    printText() {
+        let text = "";
+        let sum = 0;
+
+        for (let key in this.predictions) {
+            sum += this.predictions[key];
+        }
+        for (let key in this.predictions) {
+            text += `${key}: ${this.predictions[key] / sum * 100 + "%"}\n`;
+        }
+
+        return text;
     }
 }
 
@@ -217,10 +263,11 @@ function buildTree(dataset) {
     return new decisionNode(question, trueBranch, falseBranch);
 }
 
+//вывод в консоль
 function printTree(node, spacing) {
     if (node instanceof leafNode) {
         console.log(spacing + "Predict: ")
-        node.print();
+        node.printToConsole();
         return;
     }
 
@@ -231,4 +278,36 @@ function printTree(node, spacing) {
 
     console.log(spacing + '--> False:');
     printTree(node.falseBranch, spacing + "  ");
+}
+
+function recAddElement(parentHtmlElem, node) {
+    let listElem = document.createElement("li");
+    parentHtmlElem.appendChild(listElem);
+    let text = document.createElement("span");
+    listElem.appendChild(text);
+
+    if (node instanceof leafNode) {
+        text.innerHTML = node.printText();
+    }
+    else {
+        text.innerHTML = node.question.print();
+
+        let childrenList = document.createElement("ul");
+        listElem.appendChild(childrenList);
+
+        recAddElement(childrenList, node.trueBranch);
+
+        recAddElement(childrenList, node.falseBranch);
+    }
+}
+
+function visualiseTree(tree) {
+    treeDiv.innerHTML = "";
+
+    let list = document.createElement("ul");
+    list.className = "tree";
+
+    recAddElement(list, tree);
+
+    treeDiv.appendChild(list);
 }
