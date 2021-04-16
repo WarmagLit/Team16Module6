@@ -24,21 +24,28 @@
         <p><a href="../5Ant colony optimization/ant.html">Ant colony optimization</a></p>
         <p><a href="../6Decision tree/tree.html">Decision tree</a></p>
         <p><a href="../7NNs/neural.html">Neural network</a></p>
-        <select id = "num"> <!--раскрывающийся список-->
-          <option  value = 5 label = "5x5">
-          <option  value = 10 label = "10x10">
-          <option  selected value = 25 label = "25x25">
-          <option  value = 50 label = "50x50">
-          <option  value = 100 label = "100x100">
-        </select>
-    
+        
+        <p>Grid size:</p>
+        <input type="number" id="num" value="25">
+        
         <button id = "start">Start</button>
         <input type = "range" id="range" min="0" max="1" step="0.01" value="0.2"> 
         <button id = "gen">Generate</button>
         <button id = "clr">Clear</button>
         <br>
         <button id = "genMaze">Generate maze</button>
-        
+        <p>Heuristics: </p>
+        <select id="heuristicSelector">
+          <option value="m" label="Manhattan">
+          <option value="e" label="Euclidean">
+        </select>
+
+        <p>Cell type: </p>
+        <select id="cellTypeSelector">
+          <option value="s" label="Start">
+          <option value="e" label="End">
+          <option value="w" label="Wall" selected>
+        </select>
         </div>
 
     </main>

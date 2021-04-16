@@ -8,6 +8,7 @@ var switcher = true;    //switching between start/finish points
 // How many columns and rows?
 var size = 30;
 var prevSize = size;
+var initialized;
 
 //control elements inputs
 let inp = document.getElementById('num').value; //grid size
@@ -115,12 +116,22 @@ var Node = function () {
 
 // guess of how far it is between two nodes (manhattan version)
 function heuristic(node, otherNode) {
-    var d = dist(node.x, node.y, otherNode.x, otherNode.y);
-    //var d =  abs(node.x - otherNode.x) + abs(node.y - otherNode.y);
+    var type = document.getElementById("heuristicSelector").value;
+    var d;
+    if (type == "m") {
+        d =  abs(node.x - otherNode.x) + abs(node.y - otherNode.y);
+    }
+    else {
+        d = Math.sqrt((node.x - otherNode.x)*(node.x - otherNode.x) + (node.y - otherNode.y)*(node.y - otherNode.y));
+    }
     return d;
 }
 
-inpBtn.onclick = function(){
+inpBtn.onchange = function() {
+    if (document.getElementById('num').value > 100 || document.getElementById('num').value < 3) {
+        document.getElementById('num').value = size;
+        return;
+    }
 
     isRunning = false;
 
@@ -170,7 +181,15 @@ btnClear.onclick = function() {
 }
 
 btnGen.onclick = function() {
-
+    path.length = 0;
+    current = 0;
+    openSet.length = 0;
+    closedSet.length = 0;
+    inp = document.getElementById('num').value;
+    prevSize = size;
+    size = inp;
+    w = width / size;
+    h = height / size;
     isRunning = false;
 
     range = document.getElementById('range').value;
@@ -275,123 +294,130 @@ function setup() {
   
   
 function draw() {
-if (openSet.length > 0) {
-
-    var lowest = min_f(openSet);
-    
-    if (lowest == end) {
-        //finding the path
-        var temp = lowest;
-        path.push(temp);
-        while (temp.previousNode) {
-            path.push(temp.previousNode);
-            temp = temp.previousNode;
+    if (openSet.length > 0) {
+        var lowest = min_f(openSet);
+        
+        if (lowest == end) {
+            //finding the path
+            var temp = lowest;
+            path.push(temp);
+            while (temp.previousNode) {
+                path.push(temp.previousNode);
+                temp = temp.previousNode;
+            }
+            isRunning = false;
+            //noLoop();
+            console.log("Winner!");
         }
-        isRunning = false;
-        //noLoop();
-        console.log("Winner!");
-    }
-    
-    removeElement(openSet, lowest);
-    closedSet.push(lowest);
+        
+        removeElement(openSet, lowest);
+        closedSet.push(lowest);
 
-    var neighbours = lowest.nearNodes;
+        var neighbours = lowest.nearNodes;
 
-    for (var i = 0; i < neighbours.length; i++) {
-        var neighbor = neighbours[i];
-        if (!closedSet.includes(neighbor) && !neighbor.block) {
-            var possG = lowest.g + 1;
+        for (var i = 0; i < neighbours.length; i++) {
+            var neighbor = neighbours[i];
+            if (!closedSet.includes(neighbor) && !neighbor.block) {
+                var possG = lowest.g + heuristic(lowest, neighbor);
 
-            var newPath = false;
-            if (openSet.includes(neighbor)) {
-                if (possG < neighbor.g) {
+                var newPath = false;
+                if (openSet.includes(neighbor)) {
+                    if (possG < neighbor.g) {
+                        neighbor.g = possG;
+                        newPath = true;
+                    }
+                }
+                else {
                     neighbor.g = possG;
                     newPath = true;
+                    openSet.push(neighbor);
                 }
-            } else{
-                neighbor.g = possG;
-                newPath = true;
-                openSet.push(neighbor);
-            }
 
-            if (newPath) {
-                neighbor.previousNode = lowest;
-                neighbor.h = heuristic(neighbor, end);   
-                neighbor.f = neighbor.g + neighbor.h;
-            }
-        }
-
-    }
-}
-else {
-    return;
-}
-
-if (isRunning) {
-    background(0);
-
-    for (var i = 0; i < size; i++) {
-        for (var j = 0; j < size; j++) {
-            world[i][j].show(color(255));
-            if (world[i][j] == start) {
-                world[i][j].show(color(255,255,0));
-            }
-            if (world[i][j] == end) {
-                world[i][j].show(color(0,255,255));
+                if (newPath) {
+                    neighbor.previousNode = lowest;
+                    neighbor.h = heuristic(neighbor, end);   
+                    neighbor.f = neighbor.g + neighbor.h;
+                }
             }
         }
     }
-    
-    for (var i = 0; i < closedSet.length; i++) {
-        closedSet[i].show(color(255,0,0));
-        if (closedSet[i] == start) {
-            closedSet[i].show(color(255,255,0));
-        }
-        if (closedSet[i] == end) {
-            closedSet[i].show(color(0,255,255));
-        }
-    }
-    
-
-    for (var i = 0; i < openSet.length; i++) {
-        openSet[i].show(color(0,255,0));
+    else {
+        return;
     }
 
-    
-}
-for (var i = 0; i < path.length; i++) {
-    path[i].show(color(0,0,255));
-    start.show(color(255,255,0));
-    end.show(color(0,255,255));
+    if (isRunning) {
+        background(0);
 
-}
-
-
-
+        for (var i = 0; i < size; i++) {
+            for (var j = 0; j < size; j++) {
+                world[i][j].show(color(255));
+                if (world[i][j] == start) {
+                    world[i][j].show(color(255,255,0));
+                }
+                if (world[i][j] == end) {
+                    world[i][j].show(color(0,255,255));
+                }
+            }
+        }
+        
+        for (var i = 0; i < closedSet.length; i++) {
+            closedSet[i].show(color(255,0,0));
+            if (closedSet[i] == start) {
+                closedSet[i].show(color(255,255,0));
+            }
+            if (closedSet[i] == end) {
+                closedSet[i].show(color(0,255,255));
+            }
+        }
+        
+        for (var i = 0; i < openSet.length; i++) {
+            openSet[i].show(color(0,255,0));
+        }
+    }
+    for (var i = 0; i < path.length; i++) {
+        path[i].show(color(0,0,255));
+        start.show(color(255,255,0));
+        end.show(color(0,255,255));
+    }
 }
 
 //Creating first grid when opening the page
 createTheWorld();
+document.getElementById('num').value = 30;
 
 //Putting walls on click
 function mouseClicked(e) {
     if ((Math.floor((mouseX) / w) >= 0 && Math.floor((mouseX) / w <= size)) 
     && (Math.floor((mouseY) / h >= 0) && Math.floor((mouseY) / h <= size))) {
+        var cellType = document.getElementById("cellTypeSelector").value;
         var rect = world[Math.floor((mouseX) / w)][Math.floor((mouseY) / h)];
 
-        
-        if(rect.block == false){
-            rect.block = true;
+        if (cellType == "w") {
+            if (rect.block == false) {
+                rect.block = true;
+            }
+            else {
+                rect.block = false;
+            }
         }
-        else{
+        else if (cellType == "s") {
+            start = rect;
             rect.block = false;
+            rect.show(color(255,255,0));
         }
+        else {
+            end = rect;
+            rect.block = false;
+            rect.show(color(0,255,255));
+        }
+        
 
         setup();
     }
 }
 
 //Putting start/finish point with double click
+/*
 function doubleClicked() {
     if ((Math.floor((mouseX) / w) >= 0 && Math.floor((mouseX) / w <= size)) 
     && (Math.floor((mouseY) / h >= 0) && Math.floor((mouseY) / h <= size))) {
@@ -413,6 +439,7 @@ function doubleClicked() {
         setup();
     }
 }
+*/
 
 ////////////////////////////////////////////////////////////
 //                                                        //
@@ -449,7 +476,7 @@ function setTractors() {
             y: 0
         });
     }
-    world[0][0].block = false;
+    start.block = false;
     tractorsAreSet = true;
 }
 
@@ -564,8 +591,8 @@ btnGenMaze.onclick = function () {
 
     generateMaze();
 
-    start = world[0][0];
-    end = world[size - 1][size - 1];
+    start.block = false;
+    end.block = false;
 
     clear();
     setup();

@@ -37,3 +37,9 @@ button{
   width: 120px;
   height: 40px;
 }
+
+input{
+  width: 65px;
+  height: 30px;
+  text-align: center;
+}
