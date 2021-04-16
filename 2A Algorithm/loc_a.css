@@ -23,6 +23,10 @@ body{
     margin-left: 300px;
 }
 
+.options{
+  text-align: center;
+}
+
 #range{
   width: 156px;
 }
@@ -42,4 +46,63 @@ input{
   width: 65px;
   height: 30px;
   text-align: center;
+}
+
+input[type='number'] {
+  -webkit-appearance: none;
+  outline: none;
+  height: 25px;
+  width: 100px;
+  border-radius: 30px;
+  color: rgb(0, 0, 0);
+  border-style: none;
+  margin: 5px;
+  font-size: 25px;
+}
+
+input[type='number']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+
+  width: 15px;
+  height: 13px;
+  border-radius: 30px;
+  background: black;
+}
+
+input[type='number']:hover{
+  transition-duration: 0.3s;
+  background-color: rgba(0, 0, 0, 0.61);
+}
+
+input[type='number']:hover{
+  transition-duration: 0.3s;
+  color: #eee;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  display: none;
+}
+
+select {
+  border:none;
+  border-radius: 30px;
+}
+
+select:hover{
+  transition-duration: 0.3s;
+  background-color: rgba(0, 0, 0, 0.61);
+  color: #eee;
+}
+
+#gen , #start, #genMaze{
+  border: solid rgb(74, 122, 0);
+}
+
+#clr{
+  border: solid rgb(231, 78, 17);
+}
+
+#range {
+  width: 100%;
 }

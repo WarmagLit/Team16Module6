@@ -25,28 +25,38 @@
         <p><a href="../6Decision tree/tree.html">Decision tree</a></p>
         <p><a href="../7NNs/neural.html">Neural network</a></p>
         
-        <p>Grid size:</p>
-        <input type="number" id="num" value="25">
-        
-        <button id = "start">Start</button>
-        <input type = "range" id="range" min="0" max="1" step="0.01" value="0.2"> 
-        <button id = "gen">Generate</button>
-        <button id = "clr">Clear</button>
-        <br>
-        <button id = "genMaze">Generate maze</button>
-        <p>Heuristics: </p>
-        <select id="heuristicSelector">
-          <option value="m" label="Manhattan">
-          <option value="e" label="Euclidean">
-        </select>
+        <div class="options">
+          <div class="subOptionBlock">
+            <p>Grid size:</p>
+            <input type="number" id="num" value="25">
+            <br>
+            <input type = "range" id="range" min="0" max="1" step="0.01" value="0.2"> 
+          </div>
 
-        <p>Cell type: </p>
-        <select id="cellTypeSelector">
-          <option value="s" label="Start">
-          <option value="e" label="End">
-          <option value="w" label="Wall" selected>
-        </select>
+          <div class="subOptionBlock">
+            <p>Heuristic: </p>
+            <select id="heuristicSelector">
+              <option value="m" label="Manhattan">
+              <option value="e" label="Euclidean">
+            </select>
+    
+            <p>Cell type: </p>
+            <select id="cellTypeSelector">
+              <option value="s" label="Start">
+              <option value="e" label="End">
+              <option value="w" label="Wall" selected>
+            </select>
+          </div>
+          
+          <button id = "clr">Clear</button>
+          <button id = "gen">Generate</button>
+          <button id = "start">Start</button>
+          <button id = "genMaze">Generate maze</button>
+          
         </div>
+
+        
+      </div>
 
     </main>
 
