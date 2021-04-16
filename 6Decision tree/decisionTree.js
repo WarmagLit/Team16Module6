@@ -8,19 +8,33 @@ const papaConfig = {
 const fileSubmit = document.getElementById("csvFile");
 const buildTreeBtn = document.getElementById("buildTreeBtn");
 const treeDiv = document.getElementById("treeDiv");
+const resetFileBtn = document.getElementById("resetFileBtn");
+const classifyBtn = document.getElementById("classifyBtn");
+const attrHeaderCheck = document.getElementById("attrHeaderCheck");
+const classificationText = document.getElementById("classificationText");
+const delayRange = document.getElementById("range");
+const delayValue = document.getElementById("delayValue");
+const maxDepth = document.getElementById("maxDepth");
 const selectionTypes = [];
+const uniqueValues = [];
 
 let attrNames = [];
 let dataTable = null;
 let defaultAttrNames = true;
-let tree;
+let tree = null;
+let maxDepthValue = Infinity;
+
+
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 function defineSelectionTypes() {
-    selectionTypes.length = dataTable[0].length - 1;
+    selectionTypes.length = dataTable[dataTable.length - 1].length - 1;
 
     for (let i = 0; i < selectionTypes.length; i++) {
         selectionTypes[i] = "numeric";
-        for (let j = 0; j < dataTable[i].length; j++) {
+        for (let j = 0; j < dataTable.length; j++) {
             if (dataTable[j][i] != Number(dataTable[j][i])) {
                 selectionTypes[i] = "selection";
                 break;
@@ -29,7 +43,54 @@ function defineSelectionTypes() {
     }
 }
 
-document.getElementById("attrHeaderCheck").addEventListener("change", function() {
+function uniqueAttrValuesParcing(dataset, attrIndex) {
+    let values = [];
+    
+    for (let i = 0; i < dataset.length; i++) {
+        if (!values.includes(dataset[i][attrIndex])) {
+            values.push(dataset[i][attrIndex]);
+        }
+    }
+
+    return values;
+}
+
+function setUniqueValues(dataset) {
+    uniqueValues.length = dataset[0].length;
+    for (let i = 0; i < uniqueValues.length; i++) {
+        uniqueValues[i] = uniqueAttrValuesParcing(dataset, i);
+    }
+}
+
+function compareSelectionTypes(row, checkInclusion = true) {
+    for (let i = 0; i < selectionTypes.length; i++) {
+        selectionTypes[i] = "numeric";
+        if (row[i] != Number(row[i])) {
+            selectionTypes[i] = "selection";
+
+            if (checkInclusion && !uniqueValues.includes(row[i])) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+maxDepth.addEventListener("change", function() {
+    if (maxDepth.value <= 0) {
+        maxDepthValue = Infinity;
+    }
+    else {
+        maxDepthValue = maxDepth.value;
+    }
+});
+
+delayRange.addEventListener("input", function() {
+    delayValue.innerHTML = delayRange.value;
+});
+
+attrHeaderCheck.addEventListener("change", function() {
     if (attrNames.length != 0) {
         if (document.getElementById("attrHeaderCheck").checked && defaultAttrNames) {
             attrNames = dataTable[0];
@@ -48,19 +109,60 @@ document.getElementById("attrHeaderCheck").addEventListener("change", function()
     }
 });
 
+resetFileBtn.addEventListener("click", function() {
+    fileSubmit.value = "";
+});
+
+classifyBtn.addEventListener("click", function() {
+
+    if (tree == null) {
+        alert("Build a tree first!");
+        return;
+    }
+
+    let text = Papa.parse(classificationText.value).data[0];
+    console.log("Classifying: " + text);
+
+    let correctInput = compareSelectionTypes(text);
+    if (!correctInput) {
+        alert("Incorrect classification text");
+        return;
+    }
+    
+    visualiseTree(tree);
+    classify(text);
+});
+
+function correctFileFormat() {
+    var ext = fileSubmit.value.match(/\.([^\.]+)$/)[1];
+    switch (ext) {
+        case "csv":
+            return true;
+        default:
+            alert("Incorrect file format");
+            fileSubmit.value = "";
+            return false;
+    }
+}
+
 //добавить проверки на формат файла
-function fileSubmittion(evt) {
+fileSubmit.addEventListener("change", function (evt) {
+    if (!correctFileFormat()) {
+        return;
+    }
+
     let csvFilePath = evt.target.files[0];
     let reader = new FileReader();
     reader.readAsText(csvFilePath);
 
     reader.onload = function(event) {
+        console.log("file submitted successfully");
         let csvFile = event.target.result;
 
         let parseResults = Papa.parse(csvFile, papaConfig);
         dataTable = parseResults.data;
-        console.log("file submitted successfully");
         console.log(dataTable);
+        setUniqueValues(dataTable);
 
         if (document.getElementById("attrHeaderCheck").checked) {
             attrNames = dataTable[0];
@@ -73,19 +175,16 @@ function fileSubmittion(evt) {
             }
             defaultAttrNames = true;
         }
-
-        defineSelectionTypes();
     }
-}
-
-fileSubmit.addEventListener("change", fileSubmittion);
+});
 
 buildTreeBtn.addEventListener("click", function() {
     if (dataTable == null) {
         alert("Please choose a csv file first!");
         return;
     }
-    
+
+    defineSelectionTypes();
     tree = buildTree(dataTable);
     visualiseTree(tree);
 });
@@ -99,7 +198,7 @@ class Question {
     match(row) {
         let val = row[this.attrIndex];
         if (selectionTypes[this.attrIndex] == "numeric") {
-            return (val >= this.value);
+            return (val >= Number(this.value));
         }
         else {
             return (val == this.value);
@@ -146,18 +245,6 @@ class decisionNode {
         this.trueBranch = trueBranch;
         this.falseBranch = falseBranch;
     }
-}
-
-function uniqueAttrValuesParcing(dataset, attrIndex) {
-    let values = [];
-    
-    for (let i = 0; i < dataset.length; i++) {
-        if (!values.includes(dataset[i][attrIndex])) {
-            values.push(dataset[i][attrIndex]);
-        }
-    }
-
-    return values;
 }
 
 function answCount(dataset, attrIndex) {
@@ -238,7 +325,7 @@ function split(dataset) {
     return [bestGain, bestQuestion];
 }
 
-function buildTree(dataset) {
+function buildTree(dataset, depth = 0) {
     console.log("working with dataset: " + dataset);
 
     console.log(dataset);
@@ -247,7 +334,7 @@ function buildTree(dataset) {
     let question = s[1];
     
 
-    if (gain <= 0 || question === null) {
+    if (gain <= 0 || question === null || depth >= maxDepthValue) {
         return new leafNode(dataset);
     }
     console.log(question.print());
@@ -256,11 +343,37 @@ function buildTree(dataset) {
     let trueRows = p[0];
     let falseRows = p[1];
 
-    let trueBranch = buildTree(trueRows);
+    let trueBranch = buildTree(trueRows, depth + 1);
 
-    let falseBranch = buildTree(falseRows);
+    let falseBranch = buildTree(falseRows, depth + 1);
 
     return new decisionNode(question, trueBranch, falseBranch);
+}
+
+async function classify(row, node = tree, id = "") {
+    await timeout(delayRange.value);
+
+    if (id == "") {
+        highlight("treeRoot");
+    }
+    else {
+        highlight(id);
+    }
+
+    if (node instanceof leafNode) {
+        //alert(node.printText());
+        return;
+    }
+
+    console.log(node.question.print());
+    if (node.question.match(row)) {
+        console.log("true");
+        return classify(row, node.trueBranch, id + "1");
+    }
+    else {
+        console.log("false");
+        return classify(row, node.falseBranch, id + "0");
+    }
 }
 
 //вывод в консоль
@@ -280,10 +393,16 @@ function printTree(node, spacing) {
     printTree(node.falseBranch, spacing + "  ");
 }
 
-function recAddElement(parentHtmlElem, node) {
+function recAddElement(parentHtmlElem, node, id = "") {
     let listElem = document.createElement("li");
     parentHtmlElem.appendChild(listElem);
     let text = document.createElement("span");
+    if (id === "") {
+        text.id = "treeRoot";
+    }
+    else {
+        text.id = id;
+    }
     listElem.appendChild(text);
 
     if (node instanceof leafNode) {
@@ -295,9 +414,9 @@ function recAddElement(parentHtmlElem, node) {
         let childrenList = document.createElement("ul");
         listElem.appendChild(childrenList);
 
-        recAddElement(childrenList, node.trueBranch);
+        recAddElement(childrenList, node.trueBranch, id + "1");
 
-        recAddElement(childrenList, node.falseBranch);
+        recAddElement(childrenList, node.falseBranch, id + "0");
     }
 }
 
@@ -306,8 +425,14 @@ function visualiseTree(tree) {
 
     let list = document.createElement("ul");
     list.className = "tree";
+    treeDiv.appendChild(list);
 
     recAddElement(list, tree);
-
-    treeDiv.appendChild(list);
 }
+
+function highlight(id) {
+    console.log("Highlighting span with id " + id);
+    document.getElementById(id).style.background = "#e3a1cb";
+}
+
+//!TODO fix attrHeaderCheck
