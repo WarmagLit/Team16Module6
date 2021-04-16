@@ -3,20 +3,20 @@ body{
     position: relative;
   }
   
-  main{
-    display: inline-block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-right: -50%;
-    transform: translate(-50%, -50%);
-  }
-  
-  .vertical-menu{
-    position: absolute;
-    width: 280px;
-    display: inline-block;
-  }
+main{
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}
+
+.vertical-menu{
+  position: absolute;
+  width: 280px;
+  display: inline-block;
+}
 
 
 .p5Canvas{
@@ -26,49 +26,41 @@ body{
 select{
     width: 156px;
     height: 40px;
-  }
+}
   
-  .options{
-    margin-top: 50px;
-  }
+.options{
+  margin-top: 50px;
+}
 
-  button{
-    width: 120px;
-    height: 40px;
-  }
+button{
+  width: 120px;
+  height: 40px;
+}
 
-  #cycle{
-    font-size: 30px;
-    width: 280px;
-    height: 100px;
-    margin-bottom: 30px;
+#cycle{
+  font-size: 30px;
+  width: 280px;
+  height: 50px;
+  margin-bottom: 10px;
+  border: solid rgb(74, 122, 0);
+}
 
-    border: solid rgb(74, 122, 0);
-  }
+#start{
+  float: right;
+  border: solid rgb(74, 122, 0);
+}
 
-  #BetBlock{
-    margin-bottom: 10px;
-  }
+#clr{
+  border: solid rgb(231, 78, 17);
+}
 
-  #start{
-    float: right;
-    border: solid rgb(74, 122, 0);
-  }
+#Dist{
+  height: 65px;
+}
 
-  #clr{
-    border: solid rgb(231, 78, 17);
-  }
-  .sliders *{
-    display: inline;
-  }
+.subOptionBlock .rng{
+  float: right;
+}
+ 
 
-  .sliders p{
-    font-size: 25px;
-  }
-
-  .sliders .rng{
-    margin-top: 6.5px;
-    width: 150px;
-    float: right;
-  }
 

@@ -25,10 +25,22 @@
       <p><a href="../7NNs/neural.html">Neural network</a></p>
 
       <div class="options">
+    
+        <div class="subOptionBlock">
+          <p>Mutation chance: </p>
+          <p id="Mutation">100</p>
+          <p >%</p>
+          <input  class ="rng" id = "MutationSlide" type="range" min="0" max="100" step="1" value="100">
+        </div>
+
+        <div class="subOptionBlock" id ="Dist">
+          <p>Best distance: </p>
+          <p id="distanceHTML"></p>
+        </div>
+
         <button id = "clr">Clear</button>
         <button id = "start">Start</button>
-        <p id="pop">0</p>
-      </div>
+
       </div>
   </main>
 

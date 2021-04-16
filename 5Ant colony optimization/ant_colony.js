@@ -17,35 +17,40 @@ var isCycle = true;
 var isStarted = true;
 var bestPathCycle = 999999999;
 var bestPath = 999999999;
-var indFin = 0;
 
-var Point = function () {
-    this.x;
-    this.y;
 
-    this.dist;
-    this.chance;
-    
-    this.show = function() {
- 
+class Point {
+    x;
+    y;
+
+    dist;
+    chance;
+
+    indexPt;
+
+    show = function() {
+        stroke(0);
         fill(0);
         ellipse(this.x, this.y, 30, 30);
+
+        fill(255);
+        text(this.indexPt, this.x - 2, this.y);
     }
 
 }
 
-var Ant = function () {
+class Ant {
 
-    this.x;
-    this.y;
-    
-    this.currentPos;
-    this.visited = [];
-    this.path = [];
-    this.dist = 0;
+    x;
+    y;
+
+    currentPos;
+    visited = [];
+    path = [];
+    dist = 0;
 
 
-    this.distance = function(x2,y2){
+    distance = function(x2,y2){
         
         return (Math.sqrt(Math.pow(this.x - x2,2)+Math.pow(this.y - y2,2)));
     }
@@ -54,15 +59,15 @@ var Ant = function () {
 
 function calculate(a) {
 
-    var denominator = 0;
-    var numerator = 0;
+    let denominator = 0;
+    let numerator = 0;
 
-    for(var i = 0; i < allPoints.length; i++){
+    for(let i = 0; i < allPoints.length; i++){
 
         if(a.visited[i] == 0){
 
-            var r = a.distance(allPoints[i].x,allPoints[i].y );
-            allPoints[i].tendency = 1 / r;
+            let curDist = a.distance(allPoints[i].x,allPoints[i].y );
+            allPoints[i].tendency = 1 / curDist;
             denominator += (Math.pow(pheromone[a.currentPos][i],ALPH) * Math.pow(allPoints[i].tendency,BET));
 
         }
@@ -71,7 +76,7 @@ function calculate(a) {
         }
     }
 
-    for(var i = 0; i < allPoints.length; i++){
+    for(let i = 0; i < allPoints.length; i++){
         
         if(a.visited[i] == 0){
             numerator = Math.pow(pheromone[a.currentPos][i],ALPH) * Math.pow(allPoints[i].tendency,BET);
@@ -85,13 +90,13 @@ function calculate(a) {
 
 function findNextNode(a) {
 
-    var maxX;
-    var maxY;
-    var ind = -1;
+    let maxX;
+    let maxY;
+    let ind = -1;
 
-    var nextRand = Math.random();
+    let nextRand = Math.random();
 
-    for(var i = 0; i < allPoints.length; i++){
+    for(let i = 0; i < allPoints.length; i++){
 
         if(a.visited[i] == 0 && nextRand < allPoints[i].chance){
 
@@ -132,14 +137,14 @@ function resetAnts(j){
 
 function updatePheromone(){
 
-    for(var i = 0; i < allPoints.length; i++){
-        for(var j = 0; j < allPoints.length; j++){
+    for(let i = 0; i < allPoints.length; i++){
+        for(let j = 0; j < allPoints.length; j++){
             pheromone[i][j] *= 0.8;
         }
     }
 
-    for(var j = 0; j < ants.length; j++){
-        for(var i = 0; i < ants[j].path.length - 1; i++){
+    for(let j = 0; j < ants.length; j++){
+        for(let i = 0; i < ants[j].path.length - 1; i++){
             pheromone[ants[j].path[i]][ants[j].path[i + 1]] += 4/ants[j].dist;
             pheromone[ants[j].path[i + 1]][ants[j].path[i]] += 4/ants[j].dist;
         }
@@ -152,32 +157,24 @@ function drawFinalPath(PATHARR){
 
     isStarted = false;
 
-
     background(255);
-    for(var i = 0; i < PATHARR.length - 1; i++){
+    for(let i = 0; i < PATHARR.length - 1; i++){
         stroke(255,0,0);
         line(allPoints[PATHARR[i]].x, allPoints[PATHARR[i]].y, allPoints[PATHARR[i + 1]].x, allPoints[PATHARR[i + 1]].y);
     }
 
-    for(var i = 0; i < allPoints.length; i++){
+    for(let i = 0; i < allPoints.length; i++){
         allPoints[i].show();
-    }
-
-    fill(255);
-    ellipse(allPoints[indFin].x, allPoints[indFin].y, 30, 30);
-    for(var i = 0; i < allPoints.length; i++){
-        fill(255, 0, 0);
-        text(i, allPoints[i].x , allPoints[i].y);
     }
 }
 
 function ANTALGO(){
 
-    for(var j = 0; j < ants.length; j++){
+    for(let j = 0; j < ants.length; j++){
 
         resetAnts(j);
 
-        for(var i = 0; i < allPoints.length; i++){
+        for(let i = 0; i < allPoints.length; i++){
             calculate(ants[j]);
             findNextNode(ants[j]);
         }
@@ -190,19 +187,21 @@ function ANTALGO(){
 
             if (bestPathCycle > ants[j].dist){
                 bestPathCycle = ants[j].dist;
-                indFin = j;
                 
                 bestPathArrCycle = ants[j].path;
             }
+
+            document.getElementById('distanceHTML').innerHTML = bestPathCycle;
         }
         else{
 
             if (bestPath > ants[j].dist){
                 bestPath = ants[j].dist;
-                indFin = j;
                 
                 bestPathArr = ants[j].path;
             }
+
+            document.getElementById('distanceHTML').innerHTML = bestPath;
         }
     }
 
@@ -216,44 +215,54 @@ function ANTALGO(){
     }
 }
 
-var AntInterval;
-
 btnCycle.onclick = function(){
+
     if(isCycle){
         isCycle = false;
         btnCycle.style.border =  'solid rgb(231, 78, 17)';
+        btnCycle.innerHTML = "Acyclic";
     }
     else{
          isCycle = true;
         btnCycle.style.border =  'solid rgb(74, 122, 0)';
+        btnCycle.innerHTML = "Cyclical";
     }
 }
 
+var AntInterval;
+
 btnStart.onclick = function(){
 
-    for(var i = 0; i < allPoints.length; i++){
-        var a = new Ant();
+    btnStart.disabled = true;
+
+    for(let i = 0; i < allPoints.length; i++){
+        let a = new Ant();
         ants.push(a);
     }
 
     pheromone.length = allPoints.length;
 
-    for(var i = 0; i < allPoints.length; i++){
+    for(let i = 0; i < allPoints.length; i++){
         pheromone[i] = [];
-        for(var j = 0; j < allPoints.length; j++){
+        for(let j = 0; j < allPoints.length; j++){
             pheromone[i][j] = 0.2;
         }
     }
     
     AntInterval = setInterval(function(){
         ANTALGO();
-    }, 10);
+    }, 0);
 }
 
 btnClear.onclick = function(){
+
     clearInterval(AntInterval);
+
+    btnStart.disabled = false;
     ants.splice(0, ants.length); 
+
     document.getElementById('start').innerHTML = "Start";
+    document.getElementById('distanceHTML').innerHTML = "";
     allPoints = [];
     ants = [];
     bestPathArr = [];
@@ -270,11 +279,26 @@ function mouseClicked() {
 
     if (mouseX > 0 && mouseX < 900 && mouseY > 0 && mouseY < 900 && isStarted) {
         
-        var p = new Point();
+        let p = new Point();
 
         p.x = Math.floor(mouseX);
         p.y = Math.floor(mouseY);
-        allPoints.push(p);
+        p.indexPt = allPoints.length;
+
+        let flag = true;
+
+        for(let i = 0; i < allPoints.length; i++){
+
+            if(allPoints[i].x == p.x && allPoints[i].y == p.y){
+
+                flag = false;
+                break;
+            }
+        }
+
+        if(flag){
+            allPoints.push(p);
+        }
     }
 }
 
@@ -287,10 +311,12 @@ function setup(){
 function draw(){
 
     if(isStarted){
+
         background(255);
-     for(var i = 0; i < allPoints.length; i++){
-        allPoints[i].show();
-     }
+
+        for(let i = 0; i < allPoints.length; i++){
+           allPoints[i].show();
+        }
     }
 }
 

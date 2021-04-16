@@ -1,6 +1,8 @@
 let btnClear = document.getElementById('clr');
 let btnStart = document.getElementById('start');
 
+var mutationChance = 100;
+
 var isStarted = true;
 var allPoints = [];
 
@@ -99,12 +101,11 @@ function nextGeneration(firstSpecimen, secondSpecimen){
     
     let indexPoint = [];
     indexPoint.length = allPoints.length;
-   
+    let crossPoint = Math.round(allPoints.length / 2) + randInt(allPoints.length / 2);
     for(let i = 0; i < 10000; i++){
 
         let newChromo = new Chromosome();
-        let crossPoint =  randInt(allPoints.length / 2);
-
+      
         indexPoint.fill(0);
 
         for(let j = 0; j < crossPoint; j++){
@@ -134,20 +135,25 @@ function nextGeneration(firstSpecimen, secondSpecimen){
             }
         }
         
-        for(let i = 0; i < Math.random(5);i++){
-            let firstSwap = randInt(allPoints.length);
-            let secSwap = randInt(allPoints.length);
-            let temp;
-            while(firstSwap == secSwap){
-                secSwap = randInt(allPoints.length);
-            }
-            temp =  newChromo.gene[firstSwap];
-            newChromo.gene[firstSwap] = newChromo.gene[secSwap];
-            newChromo.gene[secSwap] = temp;
-        }
+       let mut = randInt(100);
+       
+        if(mut < mutationChance){
+
+            let border = randInt(10);   
+            for(let i = 0; i < border; i++){
+                let firstSwap = randInt(allPoints.length);
+                let secSwap = randInt(allPoints.length);
+                let temp;
+
+                while(firstSwap == secSwap){
+                    secSwap = randInt(allPoints.length);
+                }
             
-         
-        
+                temp =  newChromo.gene[firstSwap];
+                newChromo.gene[firstSwap] = newChromo.gene[secSwap];
+                newChromo.gene[secSwap] = temp;
+            }
+        }
 
         for(let j = 0; j < allPoints.length - 1; j++){
             newChromo.dist += Math.sqrt(Math.pow(newChromo.gene[j].x - newChromo.gene[j + 1].x ,2)+ Math.pow(newChromo.gene[j].y - newChromo.gene[j + 1].y ,2));
@@ -168,24 +174,19 @@ function selection(){
         return a.dist - b.dist;
     });
 
-    let nextSpecRnd = Math.random();
+    let i = 20;
 
-    if(nextSpecRnd > 0.5){
-        SecSpecimen = population[500];   
-    }
-    else{
-        let i = 25;
-        while(population[i].dist == population[0].dist){
-            i += 25;
+    while(population[i].dist == population[0].dist){
+        i += 20;
 
-            if(i > 9999){
-                i = 9999;
-                break;
-            }
+        if(i > 9999){
+            i = 9999;
+            break;
         }
-        
-        SecSpecimen = population[i];
     }
+
+    SecSpecimen = population[i];
+    
     
     population.splice(0,population.length);
 
@@ -199,7 +200,9 @@ function selection(){
     if(answ.dist > population[0].dist){
         answ = population[0];
     }   
-   
+    
+    document.getElementById('distanceHTML').innerHTML = answ.dist;
+    
     PATH = population[0];
 }
 
@@ -218,10 +221,9 @@ function drawPATH(){
 }
 
 var GenInterval;
-var currPop = 0;
 
 btnStart.onclick = function(){
-
+    btnStart.disabled = true;
     firstPopulation();
     PATH = new Chromosome();
     answ = new Chromosome();
@@ -237,12 +239,21 @@ btnStart.onclick = function(){
     GenInterval = setInterval(function(){
         selection();
         drawPATH();
-        document.getElementById('pop').innerHTML = currPop++;
     },0)
 }
 
 btnClear.onclick = function(){
+
+    clearInterval(GenInterval);
+    isStarted = true;
     allPoints = [];
+    population = [];
+    shuffleArr = [];
+
+    document.getElementById('distanceHTML').innerHTML = "";
+    PATH.dist = 99999999;
+    answ.dist = 99999999;
+    btnStart.disabled = false;
     setup();
 }
 
@@ -279,3 +290,13 @@ function draw(){
         }
     }   
 }
+
+
+function sliderChangeMutation(val) {
+    document.getElementById('Mutation').innerHTML = val;
+}
+
+document.getElementById("MutationSlide").addEventListener("input", function() {
+    mutationChance = Number(this.value);
+    sliderChangeMutation(this.value);
+ });
