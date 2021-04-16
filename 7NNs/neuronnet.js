@@ -1,36 +1,24 @@
 /*
-let clearBtn = document.getElementById('clr');
-let detectBtn = document.getElementById('dtk');
 let trainBtn = document.getElementById('trn');
-
-
-
-clearBtn.onclick = function () {
-    setup();
-}
-
-detectBtn.onclick = function () {
-    FieldReading();
-    recognize();
-    //console.log(NeuronNetwork());
-}
 
 trainBtn.onclick = function() {
     var numSet = viewDt();
 
-    for (let k = 0; k < 1; k++) {
-        var err = 0;
-        for (let epochs = 0; epochs < numOfEpochs; epochs++) {
-            for (let i = 0; i < numSet.length; i++) {
-                while(!train(numSet[i])) {
-                    err++;
-                }
+  
+    var err = 0;
+    for (let epochs = 0; epochs < numOfEpochs; epochs++) {
+        for (let i = 0; i < numSet.length; i++) {
+            while(!train(numSet[i])) {
+                err++;
             }
         }
     }
-    console.log("ended");
+    
+    //console.log(train(numSet[0]));
 }
 */
+
+
 var prevMX = null;
 var prevMY = null;
 
@@ -47,7 +35,7 @@ var currY = 0;
 var paths = []; // recording paths
 var paintFlag = false;
 var color = "black";
-var lineWidth = 20;
+var lineWidth = 25;
     
 var clearBeforeDraw = false; // controls whether canvas will be cleared on next mousedown event. Set to true after digit recognition
 
@@ -67,7 +55,6 @@ var Neuron = function () {
     this.signal = 0;
     this.error = 0;
     this.weights_delta = 0;
-    this.bias = 0;
 }
 
 var sensors = [];
@@ -80,257 +67,68 @@ for (let i = 0; i < gridSize; i++) {
     }
 }
 
-
+//-----------------------------initialize---------------------------------
 var firstLayer = [];
 var W1 = [];
 var hiddenLayer1 = [];
 var W2 = [];
 var outputLayer = [];
+var biases2 = [];
+var biases3 = [];
+var nnMaxIndex = 0;
 
 for (let i = 0; i < firstLayerNeurons; i++) {
     firstLayer[i] = new Neuron();
 }
-
-for (let i = 0; i < firstLayerNeurons; i++) {
-    W1[i] = new Array(hiddenLayerNeurons);
+for (let i = 0; i < hiddenLayerNeurons; i++) {
+    W1[i] = new Array(firstLayerNeurons);
 }
-//------------------------------------------------
-for (let i = 0; i < firstLayerNeurons; i++) {
-    for (let j = 0; j < hiddenLayerNeurons; j++) {
+for (let i = 0; i < hiddenLayerNeurons; i++) {
+    for (let j = 0; j < firstLayerNeurons; j++) {
         W1[i][j] = Math.random(1);
     }
 }
-//------------------------------------------------
 for (let i = 0; i < hiddenLayerNeurons; i++) {
     hiddenLayer1[i] = new Neuron();
-    hiddenLayer1[i].bias = Math.random(2) - 1;
+    biases2[i] = Math.random(2) - 1;
 }
 
-
-for (let i = 0; i < hiddenLayerNeurons; i++) {
-    W2[i] = new Array(outputLayerNeurons);
+for (let i = 0; i < outputLayerNeurons; i++) {
+    W2[i] = new Array(hiddenLayerNeurons);
 }
-//------------------------------------------------
-for (let i = 0; i < hiddenLayerNeurons; i++) {
-    for (let j = 0; j < outputLayerNeurons; j++) {
+for (let i = 0; i < outputLayerNeurons; i++) {
+    for (let j = 0; j < hiddenLayerNeurons; j++) {
         W2[i][j] = Math.random(1);
     }
 }
-//------------------------------------------------
 for (let i = 0; i < outputLayerNeurons; i++) {
     outputLayer[i] = new Neuron();
-    outputLayer[i].bias = Math.random(2) - 1;
-}
-
-function FieldReading() {
-    //clear();
-    //background(220);
-    for (let i = 0; i < gridSize; i++) {
-        for (let j = 0; j < gridSize; j++) {
-            if (sensors[i][j].signal == 1) {
-                //fill(0);
-                //strokeWeight(side);
-                //rect(i * side, j * side, side, side);
-            }
-        }
-    }
-}
-
-function sigmoid(x) {
-    let res = 1 / (1 + exp(-x));
-    return res;
-}
-
-function sigmoidDX(x) {
-    return sigmoid(x)/(1 - sigmoid(x));
-}
-
-function NeuronNetwork() {
-
-    //initialize    
-    for (let j  = 0; j < hiddenLayerNeurons; j++) {
-        hiddenLayer1[j].signal = 0;
-    }
-    for (let i  = 0; i < outputLayerNeurons; i++) {
-        outputLayer[i].signal = 0;
-    }
-
-    for (let i = 0; i < gridSize; i++) {
-        for (let j = 0; j < gridSize; j++) {
-            firstLayer[i*gridSize + j].signal = sensors[i][j].signal; 
-        }
-    }
-
-     //calculate
-    for (let i  = 0; i < hiddenLayerNeurons; i++) {
-        for (let j  = 0; j < firstLayerNeurons; j++) {
-            hiddenLayer1[i].signal += W1[j][i] * firstLayer[j].signal; 
-        }
-    }
-
-    for (let i  = 0; i < hiddenLayerNeurons; i++) {
-        hiddenLayer1[i].signal = sigmoid(hiddenLayer1[i].signal + hiddenLayer1[i].bias);
-    }
-
-    for (let i  = 0; i < outputLayerNeurons; i++) {
-        for (let j  = 0; j < hiddenLayerNeurons; j++) {
-            outputLayer[i].signal += W2[j][i] * hiddenLayer1[j].signal; 
-        }
-    }
-
-    for (let i  = 0; i < outputLayerNeurons; i++) {
-        outputLayer[i].signal = sigmoid(outputLayer[i].signal + outputLayer[i].bias);
-    }
-
-    var winner = 0;
-    for (let i = 0; i < outputLayerNeurons; i++) {
-        if (outputLayer[i].signal > outputLayer[winner].signal) {
-            winner = i;
-        }
-    }
-    return winner;
-    
-}
-
-function train(template) {
-    let number = template.number;
-    firstLayer = template.inputLayer;
-
-    let result = NeuronNetwork();
-    if  (result == number) {
-        return true;
-    }
-
-    for (let j  = 0; j < hiddenLayerNeurons; j++) {
-        hiddenLayer1[j].error = 0;
-    }
-    for (let i  = 0; i < outputLayerNeurons; i++) {
-        outputLayer[i].error = 0;
-    }
-
-    //ошибки нейронов и дельты весов выходного слоя
-    for (let i = 0; i < outputLayerNeurons; i++) {
-        if (number == i) {
-            outputLayer[i].error = ( outputLayer[i].signal - 1) * sigmoidDX(outputLayer[i].signal);
-        } 
-        else {
-            outputLayer[i].error = outputLayer[i].signal * sigmoidDX(outputLayer[i].signal);
-        } 
-        outputLayer[i].weights_delta = outputLayer[i].error;
-    }
-
-
-    //ошибки нейронов спрятанного слоя
-    for (let i = 0; i < hiddenLayerNeurons; i++) {
-        for (let j = 0; j < outputLayerNeurons; j++) {
-            hiddenLayer1[i].error += outputLayer[j].error * W2[i][j] * sigmoidDX(hiddenLayer1[i].signal); 
-        }
-        hiddenLayer1[i].weights_delta = hiddenLayer1[i].error;
-    }
-
-    //пересчёт весов из спрятанного слоя в выходной слой
-    for (let i = 0; i < hiddenLayerNeurons; i++) {
-        for (let j = 0; j < outputLayerNeurons; j++) {
-            W2[i][j] = W2[i][j] - hiddenLayer1[i].signal * outputLayer[j].weights_delta * learning_rate;
-        }
-    }
-
-    //пересчёт весов из спрятанного слоя в выходной слой
-    for (let i = 0; i < firstLayerNeurons; i++) {
-        for (let j = 0; j < hiddenLayerNeurons; j++) {
-            W1[i][j] = W1[i][j] - firstLayer[i].signal * hiddenLayer1[j].weights_delta * learning_rate;
-        }
-    }
-
-    return false;
-
-}
-
-function outputError() {
-    for (let i = 0; i < outputLayer.length; i++) {
-        //something...
-    }
-}
-/*
-function mouseDragged() {
-    prevMX = mouseX;
-    prevMY = mouseY;
-    
-    let x = Math.floor(mouseX / side);
-    let y = Math.floor(mouseY / side);
-    if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
-        sensors[x][y].signal = 1;
-        rect(x * side, y * side, side, side);
-    }
-
-    return false;
-
-}
-function mouseReleased() {
-    prevMX = null;
-    prevMY = null;
-}*/
-
-function setup() {
-    /*
-    let cnv = createCanvas(w, h);
-    cnv.id('mycanvas');
-
-    //background(255);
-
-    sensors.length = 0;
-    for (let i = 0; i < gridSize; i++) {
-        sensors[i] = new Array(gridSize);
-    }
-    for (let i = 0; i < gridSize; i++) {
-        for (let j = 0; j < gridSize; j++) {
-            sensors[i][j] = new Neuron();
-        }
-    }
-
-    for (let i = 0; i < firstLayerNeurons; i++) {
-        firstLayer[i] = new Neuron();
-    }
-    */
+    biases3[i] = Math.random(2) - 1;
 }
 
 
-var correctNumber = function() {
+var correctNumber = function(isChecked) {
     this.inputLayer = firstLayer;
-    this.number = document.getElementById('num').value;
-}
-
-
-//Local Storage functions
-function saveDt() {
-    FieldReading();
-    console.log(NeuronNetwork());
-
-    var new_data = new correctNumber();
-    if (localStorage.getItem('data2') == null) {
-        localStorage.setItem('data2', '[]');
+    if (isChecked) {
+        this.number = nnMaxIndex;
     }
-
-    var old_data = JSON.parse(localStorage.getItem('data2'));
-    old_data.push(new_data);
-
-    localStorage.setItem('data2', JSON.stringify(old_data));
-}
-
-var numSet;
-function viewDt() {
-    if (localStorage.getItem('data2') != null) {
-        numSet = JSON.parse(localStorage.getItem('data2'));
+    else {
+        this.number = JSON.parse(document.getElementById('num').value);
     }
-    return numSet;
 }
+
+
+function rgb(r, g, b){
+    return "rgb("+r+","+g+","+b+")";
+  }
 
 var main;
-
 function init() {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext("2d");
     main = document.getElementById('mainblock');
+    erase();
+
 
     canvas.addEventListener("mousemove", function (e) {
         findxy('move', e)
@@ -344,11 +142,20 @@ function init() {
     canvas.addEventListener("mouseout", function (e) {
         findxy('out', e)
     }, false);
+
+    //part of training code (deleted part)
+    /*
+    if (JSON.parse(localStorage.getItem('data')) != null) {
+        document.getElementById('dtLen').innerHTML = "Dataset: " + JSON.parse(localStorage.getItem('data')).length;
+    }
+     else {
+        document.getElementById('dtLen').innerHTML = "Dataset: 0";
+     }
+     */
 }
 
 
 function nn(data, w12, bias2, w23, bias3) {
-    // just some incomplete sanity checks to find the most obvious errors
     if (!Array.isArray(data) || data.length == 0 ||
         !Array.isArray(w12) || w12.length == 0 || !Array.isArray(w12[0]) || data.length != w12[0].length || !Array.isArray(bias2) || bias2.length != w12.length ||
         !Array.isArray(w23) || w23.length == 0 || !Array.isArray(w23[0]) || w12.length != w23[0].length || !Array.isArray(bias3) || bias3.length != w23.length) {
@@ -382,8 +189,17 @@ function nn(data, w12, bias2, w23, bias3) {
     var denominator = nominators.reduce(function (p, c) { return p + c; });
     var output = nominators.map(function(e) { return e / denominator; });
 
+    for (let i = 0; i < hiddenLayerNeurons; i++) {
+        hiddenLayer1[i].signal = out2[i];
+    }
+    for (let i = 0; i < outputLayerNeurons; i++) {
+        hiddenLayer1[i].signal = out2[i];
+        outputLayer[i].signal = output[i];
+    }
+
     // timing measurement
-    var dt = new Date() - t1; console.log('NN time: '+dt+'ms');
+    var dt = new Date() - t1; 
+    console.log('NN time: '+dt+'ms');
     return output;
 }
 
@@ -397,7 +213,7 @@ function recognize() {
     var trans = centerImage(grayscaleImg); // [dX, dY] to center of mass
 
     // copy image to hidden canvas, translate to center-of-mass, then
-    // scale to fit into a 200x200 box (see MNIST calibration notes on
+    // scale to fit into a 400x400 box (see MNIST calibration notes on
     // Yann LeCun's website)
     var canvasCopy = document.createElement("canvas");
     canvasCopy.width = imgData.width;
@@ -429,10 +245,11 @@ function recognize() {
     }
     
         
-     // now bin image into 10x10 blocks (giving a 28x28 image)
+     // now bin image into 20x20 blocks (giving a 28x28 image)
      imgData = copyCtx.getImageData(0, 0, 560, 560);
      grayscaleImg = imageDataToGrayscale(imgData);
      var nnInput = new Array(784);
+     firstLayer = nnInput;
      for (var y = 0; y < 28; y++) {
          for (var x = 0; x < 28; x++) {
          var mean = 0;
@@ -482,21 +299,50 @@ function recognize() {
     
     var maxIndex = 0;
     var nnOutput = nn(nnInput, w12, bias2, w23, bias3);
+    numProgress(nnOutput);
     console.log(nnOutput);
     nnOutput.reduce(function(p,c,i){if(p<c) {maxIndex=i; return c;} else return p;});
     console.log('maxIndex: '+maxIndex);
     document.getElementById('nnOut').innerHTML = maxIndex;
+    nnMaxIndex = maxIndex;
     clearBeforeDraw = true;
     var dt = new Date() - t1;
     document.getElementById('recTime').innerHTML =  'Recognize time: ' + dt + " ms";  
     console.log('recognize time: '+dt+'ms');
 }
 
+function numProgress(nnOutput) {
+    document.getElementById('pr0').value = midFunc(nnOutput[0])*100;
+    document.getElementById('pr1').value = midFunc(nnOutput[1])*100;
+    document.getElementById('pr2').value = midFunc(nnOutput[2])*100;
+    document.getElementById('pr3').value = midFunc(nnOutput[3])*100;
+    document.getElementById('pr4').value = midFunc(nnOutput[4])*100;
+    document.getElementById('pr5').value = midFunc(nnOutput[5])*100;
+    document.getElementById('pr6').value = midFunc(nnOutput[6])*100;
+    document.getElementById('pr7').value = midFunc(nnOutput[7])*100;
+    document.getElementById('pr8').value = midFunc(nnOutput[8])*100;
+    document.getElementById('pr9').value = midFunc(nnOutput[9])*100;
+
+}
+
+function midFunc(x) {
+    if (x > 0.6) {
+        return x;
+    } 
+    if (x > 0.08) {
+        return x*1.5;
+    }
+    if (x > 0.02) {
+        return x*8;
+    }
+    return x*20;
+    
+}
 
 function findxy(res, e) {
     if (res == 'down') {
         if (clearBeforeDraw == true) {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
+        erase();
         document.getElementById('nnInput').innerHTML='';
         document.getElementById('nnOut').innerHTML='';
         paths = [];
@@ -505,14 +351,14 @@ function findxy(res, e) {
          
         if (e.pageX != undefined && e.pageY != undefined) {
             currX = e.pageX-main.offsetLeft + 128;
-            currY = e.pageY-main.offsetTop + 286;
+            currY = e.pageY-main.offsetTop + 380;
         } else {
         currX = e.clientX + document.body.scrollLeft
                 + document.documentElement.scrollLeft
                 - main.offsetLeft + 128;
         currY = e.clientY + document.body.scrollTop
                 + document.documentElement.scrollTop
-                - main.offsetTop + 286;
+                - main.offsetTop + 380;
         }
         //draw a circle
         ctx.beginPath();
@@ -537,14 +383,14 @@ function findxy(res, e) {
             prevY = currY;
             if (e.pageX != undefined && e.pageY != undefined) {
             currX = e.pageX-main.offsetLeft + 128;
-            currY = e.pageY-main.offsetTop + 286;
+            currY = e.pageY-main.offsetTop + 380;
             } else {
             currX = e.clientX + document.body.scrollLeft
                     + document.documentElement.scrollLeft
                     - main.offsetLeft + 128;
             currY = e.clientY + document.body.scrollTop
                     + document.documentElement.scrollTop
-                    - main.offsetTop + 286;
+                    - main.offsetTop + 380;
             }
             currPath = paths[paths.length-1];
             currPath[0].push(currX);
@@ -643,6 +489,9 @@ function erase() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     document.getElementById('nnOut').innerHTML = '';
     paths.length = 0;
+    ctx.rect(0, 0, canvas.width + 10, canvas.height  + 5);
+    ctx.fillStyle = '#F5F5F5';
+    ctx.fill();
 }
 init();
 

@@ -44,3 +44,7 @@ select{
     width: 120px;
     height: 40px;
   }
+
+  #num{
+    width: 100px;
+  }

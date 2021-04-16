@@ -19,6 +19,7 @@ var Point = function () {
     this.Centroid = null;
     this.color = 0;
     this.theChosenOne = false;
+    this.inGroup = null;
 
     this.spawn = function() {
         while(true) {

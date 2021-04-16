@@ -6,8 +6,8 @@ body{
 main{
   display: inline-block;
     position: absolute;
-    top: 40%;
-    left: 50%;
+    top: 50%;
+    left: 45%;
     margin-right: -50%;
     transform: translate(-50%, -50%);
 }
@@ -39,6 +39,20 @@ button{
   height: 40px;
 }
 
+#num{
+  margin: 10px;
+}
+
+#autoRec{
+  width: 15px;
+  height: 15px;
+  margin-left: 10px;
+}
+
 #recTime{
+  margin-left: 300px;
+}
+
+.progressBar{
   margin-left: 300px;
 }

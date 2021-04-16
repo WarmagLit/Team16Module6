@@ -7,10 +7,11 @@
 
   <link rel="stylesheet" href="../style.css"/>
   <link rel="stylesheet" href="loc_neural.css"/>
-
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+  <script src="./mnist-master/dist/mnist.js"></script>
 </head>
 
 <body>
@@ -24,22 +25,40 @@
       <p><a href="../5Ant colony optimization/ant.html">Ant colony optimization</a></p>
       <p><a href="../6Decision tree/tree.html">Decision tree</a></p>
       <div style="padding: 10px;"></div>
-
       
       <button onclick="erase()">Clear</button>
       <button onclick="recognize()">Recognize</button>
-      <input type="number" id="num" value="0">
-
-      <button onclick="saveDt()">Save</button>
-      <button onclick="viewDt()">View</button>
+      
 
       <div id="nnInput"></div>
       <div style="float:left;font-size:200px;margin-left:80px;" id="nnOut"></div>
     </div>
     <canvas id="canvas" width="560" height="560" style="border:2px solid;"></canvas>
     <div id="recTime"></div>
-  </main>
     
+    <div class="progressBar">
+      <progress id="pr0" max="100" value="0"></progress><a> 0</a>
+      <div></div>
+      <progress id="pr1" max="100" value="0"></progress><a> 1</a>
+      <div></div>
+      <progress id="pr2" max="100" value="0"></progress><a> 2</a>
+      <div></div>
+      <progress id="pr3" max="100" value="0"></progress><a> 3</a>
+      <div></div>
+      <progress id="pr4" max="100" value="0"></progress><a> 4</a>
+      <div></div>
+      <progress id="pr5" max="100" value="0"></progress><a> 5</a>
+      <div></div>
+      <progress id="pr6" max="100" value="0"></progress><a> 6</a>
+      <div></div>
+      <progress id="pr7" max="100" value="0"></progress><a> 7</a>
+      <div></div>
+      <progress id="pr8" max="100" value="0"></progress><a> 8</a>
+      <div></div>
+      <progress id="pr9" max="100" value="0"></progress><a> 9</a>
+
+    </div>
+  </main>
     
     <script src="neuronnet.js"></script>
 </body>
