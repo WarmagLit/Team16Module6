@@ -13,39 +13,55 @@
 
 <body>
   <main>
-    <div class="vertical-menu">
-      <p><a href="../1MainPage/main.html">Main page</a></p>
-      <p><a href="../2A Algorithm/a_star.html">A* algorithm</a></p>
-      <p><a href="../3Cluster analysis/cluster.html">Cluster analysis</a></p>
-      <p><a href="../4Genetic algorithm/gen.html">Genetic algorithm</a></p>
-      <p><a href="../5Ant colony optimization/ant.html">Ant colony optimization</a></p>
-      <p><a href="../7NNs/neural.html">Neural network</a></p>
-
-      <p>Choose a csv-file:</p>
-      <input type="file" id="csvFile" accept=".csv">
-
-      <div id="attrHeaderCheckDiv">
-        <label for="attrHeaderCheck">Attribute names? </label>
-        <input type="checkbox" id="attrHeaderCheck" accept=".csv">
-      </div>
-
-      <button id="resetFileBtn" style="margin-top: 5px">Reset file</button>
-
-      <textarea id="classificationText" rows="4" placeholder="csv text for classification"></textarea>
-
-      <button id="buildTreeBtn">Build tree</button>
-      <button id="classifyBtn">Classify</button>
-
-      <p>Animation speed: </p>
-      <input type = "range" id="range" min="50" max="2000" step="50" value="250">
-      <p id="delayValue">250</p>
-
-      <p style="margin-top: 15px">Max depth (&#x02264 0 = unlimited): </p>
-      <input type="number" value="0" id="maxDepth">
-    </div>
-    <!--<div id="fix">a</div>-->
-    <div id="treeDiv" >
+      <div class="vertical-menu">
+        <p><a href="../1MainPage/main.html">Main page</a></p>
+        <p><a href="../2A Algorithm/a_star.html">A* algorithm</a></p>
+        <p><a href="../3Cluster analysis/cluster.html">Cluster analysis</a></p>
+        <p><a href="../4Genetic algorithm/gen.html">Genetic algorithm</a></p>
+        <p><a href="../5Ant colony optimization/ant.html">Ant colony optimization</a></p>
+        <p><a href="../7NNs/neural.html">Neural network</a></p>
       
+        <div class="options">
+        
+          <div class="subOptionBlock">
+          
+            <p>Choose a csv-file:</p>
+            <input type="file" id="csvFile" accept=".csv">
+          
+            <div id="attrHeaderCheckDiv">
+              <label for="attrHeaderCheck"><p>Attribute names? </p></label>
+              <input type="checkbox"  id="attrHeaderCheck" accept=".csv">
+            </div>
+          </div>
+        
+        
+        
+          <div class="subOptionBlock">
+            <textarea id="classificationText" rows="4" placeholder="csv text for classification"></textarea>
+          </div>
+        
+          <div class="subOptionBlock">
+            <p>Animation speed: </p>
+            <input type = "range" id="range" min="50" max="2000" step="50" value="250">
+            <p id="delayValue">250</p>
+          </div>
+
+          <div class="subOptionBlock" id="depth">
+            <p>Max depth (&#x02264 0 = unlimited): </p>
+            <input type="number" value="0" id="maxDepth">
+          </div>
+
+          <button id="buildTreeBtn">Build tree</button>
+            <button id="classifyBtn">Classify</button>
+            <button id="resetFileBtn" style="margin-top: 5px">Reset file</button>
+        </div>
+
+        </div>
+        
+      <div class="layer">
+        <div id="treeDiv" ></div>
+      </div>
+        
     </div>
   </main>
   <script type="text/javascript" src="papaparse.js"></script>

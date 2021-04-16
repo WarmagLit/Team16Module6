@@ -1,5 +1,5 @@
 
-let btnClear2 = document.getElementById('clr2');
+let btnClear2 = document.getElementById('clr');
 let btnClust2 = document.getElementById('cluster2');
 
 btnClust2.onclick = function() {
