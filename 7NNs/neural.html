@@ -26,17 +26,22 @@
       <p><a href="../6Decision tree/tree.html">Decision tree</a></p>
       <div style="padding: 10px;"></div>
       
-      <button onclick="erase()">Clear</button>
-      <button onclick="recognize()">Recognize</button>
-      
+      <div class="options">
+        <button onclick="erase()" style="border: solid rgb(231, 78, 17);;">Clear</button>
+        <button onclick="recognize()" style="border: solid rgb(74, 122, 0);">Recognize</button>
+        
 
-      <div id="nnInput"></div>
-      <div style="float:left;font-size:200px;margin-left:80px;" id="nnOut"></div>
+        
+        <div class="subOptionBlock" style="height: 190px;">
+          <div id="nnInput"></div>
+          <div style="font-size:150px;" id="nnOut"></div>
+        </div>
+      </div>
     </div>
     <canvas id="canvas" width="560" height="560" style="border:2px solid;"></canvas>
-    <div id="recTime"></div>
+    <div id="recTime">Recognize time:</div>
     
-    <div class="progressBar">
+    <div class="subOptionBlock" id="bars">
       <progress id="pr0" max="100" value="0"></progress><a> 0</a>
       <div></div>
       <progress id="pr1" max="100" value="0"></progress><a> 1</a>
@@ -57,7 +62,7 @@
       <div></div>
       <progress id="pr9" max="100" value="0"></progress><a> 9</a>
 
-    </div>
+  </div>
   </main>
     
     <script src="neuronnet.js"></script>

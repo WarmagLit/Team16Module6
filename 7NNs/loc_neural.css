@@ -19,8 +19,7 @@ main{
 }
 
 canvas{
- margin-left: 300px;
-  
+ margin-left: 300px; 
 }
 
 select{
@@ -49,10 +48,15 @@ button{
   margin-left: 10px;
 }
 
-#recTime{
-  margin-left: 300px;
+#bars{
+  width: 274px;
+
 }
 
-.progressBar{
-  margin-left: 300px;
+.options{
+  text-align: center;
+}
+
+#recTime{
+  margin-left: 55px;
 }
