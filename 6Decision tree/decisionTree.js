@@ -71,7 +71,7 @@ function compareSelectionTypes(row, checkInclusion = true) {
         if (row[i] != Number(row[i])) {
             selectionTypes[i] = "selection";
 
-            if (checkInclusion && !uniqueValues.includes(row[i])) {
+            if (checkInclusion && !uniqueValues[i].includes(row[i])) {
                 return false;
             }
         }
