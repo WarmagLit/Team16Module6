@@ -351,14 +351,14 @@ function findxy(res, e) {
          
         if (e.pageX != undefined && e.pageY != undefined) {
             currX = e.pageX-main.offsetLeft + 128;
-            currY = e.pageY-main.offsetTop + 380;
+            currY = e.pageY-main.offsetTop + 430;
         } else {
         currX = e.clientX + document.body.scrollLeft
                 + document.documentElement.scrollLeft
                 - main.offsetLeft + 128;
         currY = e.clientY + document.body.scrollTop
                 + document.documentElement.scrollTop
-                - main.offsetTop + 380;
+                - main.offsetTop + 430;
         }
         //draw a circle
         ctx.beginPath();
@@ -383,14 +383,14 @@ function findxy(res, e) {
             prevY = currY;
             if (e.pageX != undefined && e.pageY != undefined) {
             currX = e.pageX-main.offsetLeft + 128;
-            currY = e.pageY-main.offsetTop + 380;
+            currY = e.pageY-main.offsetTop + 430;
             } else {
             currX = e.clientX + document.body.scrollLeft
                     + document.documentElement.scrollLeft
                     - main.offsetLeft + 128;
             currY = e.clientY + document.body.scrollTop
                     + document.documentElement.scrollTop
-                    - main.offsetTop + 380;
+                    - main.offsetTop + 430;
             }
             currPath = paths[paths.length-1];
             currPath[0].push(currX);
