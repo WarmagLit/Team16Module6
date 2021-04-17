@@ -48,7 +48,7 @@ textarea {
   margin-left: 300px;
 }
 
-#range{
+#range, #minNecessaryRatio{
   width: 272px;
 }
 
@@ -176,4 +176,9 @@ tree visualisation
 
 #resetFileBtn{
   border: solid rgb(231, 78, 17);
+}
+
+.subOptionBlock{
+  margin-top: 10px;
+  margin-bottom: 10px;
 }

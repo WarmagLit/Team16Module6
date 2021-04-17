@@ -30,7 +30,7 @@
           
             <div id="attrHeaderCheckDiv">
               <label for="attrHeaderCheck"><p>Attribute names? </p></label>
-              <input type="checkbox"  id="attrHeaderCheck" accept=".csv">
+              <input type="checkbox"  id="attrHeaderCheck">
             </div>
           </div>
         
@@ -51,18 +51,23 @@
             <input type="number" value="0" id="maxDepth">
           </div>
 
+          <div class="subOptionBlock" id="ratio">
+            <p>Minimal split ratio: </p>
+            <input type="checkbox"  id="minRatioCheck">
+            <input type = "range" id="minNecessaryRatio" min="75" max="100" step="1" value="90" disabled>
+            <p id="minNecessaryRatioValue">90</p>
+          </div>
+
           <button id="buildTreeBtn">Build tree</button>
-            <button id="classifyBtn">Classify</button>
-            <button id="resetFileBtn" style="margin-top: 5px">Reset file</button>
+          <button id="classifyBtn">Classify</button>
+          <button id="resetFileBtn" style="margin-top: 5px">Reset file</button>
         </div>
 
-        </div>
+      </div>
         
       <div class="layer">
         <div id="treeDiv" ></div>
       </div>
-        
-    </div>
   </main>
   <script type="text/javascript" src="papaparse.js"></script>
   <script src="decisionTree.js"></script>

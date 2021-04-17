@@ -15,6 +15,9 @@ const classificationText = document.getElementById("classificationText");
 const delayRange = document.getElementById("range");
 const delayValue = document.getElementById("delayValue");
 const maxDepth = document.getElementById("maxDepth");
+const minNecessaryRatioRange = document.getElementById("minNecessaryRatio");
+const minNecessaryRatioValue = document.getElementById("minNecessaryRatioValue");
+const minRatioCheck = document.getElementById("minRatioCheck");
 const selectionTypes = [];
 const uniqueValues = [];
 
@@ -76,6 +79,14 @@ function compareSelectionTypes(row, checkInclusion = true) {
 
     return true;
 }
+
+minRatioCheck.addEventListener("change", function() {
+    minNecessaryRatioRange.disabled = !minNecessaryRatioRange.disabled;
+});
+
+minNecessaryRatioRange.addEventListener("input", function() {
+    minNecessaryRatioValue.innerHTML = minNecessaryRatioRange.value;
+});
 
 maxDepth.addEventListener("change", function() {
     if (maxDepth.value <= 0) {
@@ -298,6 +309,7 @@ function countInfoGain(currUncertainty, trueBranch, falseBranch) {
 function split(dataset) {
     let bestGain = 0;
     let bestQuestion = null;
+    let maxSplitRatio = 0;
     currUncertainty = countGiniImp(dataset);
 
     for (let i = 0; i < attrNames.length - 1; i++) {
@@ -318,23 +330,42 @@ function split(dataset) {
             if (gain > bestGain) {
                 bestGain = gain;
                 bestQuestion = question;
+                let predictions = answCount(dataset, attrNames.length - 1);
+                let sum = 0;
+                for (let key in predictions) {
+                    sum += predictions[key];
+                }
+                for (let key in predictions) {
+                    if (predictions[key] / sum * 100 > maxSplitRatio) {
+                        maxSplitRatio = predictions[key] / sum * 100;
+                    }
+                }
             }
         }
     }
 
-    return [bestGain, bestQuestion];
+    return [bestGain, bestQuestion, maxSplitRatio];
 }
 
 function buildTree(dataset, depth = 0) {
     console.log("working with dataset: " + dataset);
 
     console.log(dataset);
+    let minNecessaryRatio;
     let s = split(dataset);
     let gain = s[0];
     let question = s[1];
+    let maxSplitRatio = s[2];
+
+    if (minRatioCheck.checked) {
+        minNecessaryRatio = minNecessaryRatioRange.value;
+    }
+    else {
+        minNecessaryRatio = Infinity;
+    }
     
 
-    if (gain <= 0 || question === null || depth >= maxDepthValue) {
+    if (gain <= 0 || question === null || depth >= maxDepthValue || maxSplitRatio >= minNecessaryRatio) {
         return new leafNode(dataset);
     }
     console.log(question.print());
